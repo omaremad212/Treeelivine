@@ -15,15 +15,17 @@ export default async function DashboardRootLayout({
   }
 
   return (
-    <DashboardLayout
-      user={{
-        name: session.user.name,
-        email: session.user.email,
-        image: session.user.image,
-        role: session.user.role,
-      }}
-    >
-      {children}
-    </DashboardLayout>
+    <div className="dark">
+      <DashboardLayout
+        user={{
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image,
+          role: session.user.role,
+        }}
+      >
+        {children}
+      </DashboardLayout>
+    </div>
   )
 }

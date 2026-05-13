@@ -9,28 +9,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Treelivine ERP",
+    default: "Treelivine ERP — Run Your Business From One Platform",
     template: "%s | Treelivine ERP",
   },
-  description: "Enterprise Resource Planning system for modern businesses",
-  keywords: ["ERP", "business management", "inventory", "orders", "CRM"],
+  description:
+    "Treelivine ERP helps businesses manage sales, inventory, finance, customers, suppliers, and reports from one modern dashboard.",
+  keywords: ["ERP", "business management", "inventory", "orders", "CRM", "finance"],
   authors: [{ name: "Treelivine" }],
-  icons: {
-    icon: "/favicon.ico",
-  },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark h-full" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} font-sans h-full bg-[#0D0F12] text-[#F8FAFC] antialiased`}
-        suppressHydrationWarning
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         {children}
       </body>
     </html>
