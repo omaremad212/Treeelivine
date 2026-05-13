@@ -27,7 +27,7 @@ export default function Stats() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="text-center"
             >
-              <div className="text-4xl lg:text-5xl font-extrabold text-white mb-2 tabular-nums">
+              <div className="text-3xl lg:text-4xl font-extrabold text-white mb-2 tabular-nums">
                 {s.value}
               </div>
               <div className="text-purple-200 text-sm font-medium">{s.label}</div>

@@ -113,7 +113,7 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4"
+            className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4"
           >
             Everything your business needs
           </motion.h2>

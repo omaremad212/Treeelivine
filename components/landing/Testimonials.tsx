@@ -54,7 +54,7 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4"
+            className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4"
           >
             What our users say
           </motion.h2>

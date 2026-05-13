@@ -11,8 +11,12 @@ export async function middleware(req: NextRequest) {
     nextUrl.pathname.startsWith("/forgot-password")
 
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth")
-  const isDashboardRoute =
-    nextUrl.pathname.startsWith("/dashboard") ||
+
+  // /dashboard itself is always public (demo mode for unauthenticated visitors)
+  const isDemoPublic = nextUrl.pathname === "/dashboard"
+
+  // Sub-pages beyond /dashboard require a session
+  const isProtectedRoute =
     nextUrl.pathname.startsWith("/customers") ||
     nextUrl.pathname.startsWith("/products") ||
     nextUrl.pathname.startsWith("/orders") ||
@@ -22,9 +26,8 @@ export async function middleware(req: NextRequest) {
     nextUrl.pathname.startsWith("/users") ||
     nextUrl.pathname.startsWith("/settings")
 
-  if (isApiAuthRoute) {
-    return NextResponse.next()
-  }
+  if (isApiAuthRoute) return NextResponse.next()
+  if (isDemoPublic)   return NextResponse.next()
 
   const token = await getToken({
     req,
@@ -34,13 +37,11 @@ export async function middleware(req: NextRequest) {
   const isLoggedIn = !!token
 
   if (isAuthPage) {
-    if (isLoggedIn) {
-      return NextResponse.redirect(new URL("/dashboard", nextUrl))
-    }
+    if (isLoggedIn) return NextResponse.redirect(new URL("/dashboard", nextUrl))
     return NextResponse.next()
   }
 
-  if (isDashboardRoute && !isLoggedIn) {
+  if (isProtectedRoute && !isLoggedIn) {
     const loginUrl = new URL("/login", nextUrl)
     loginUrl.searchParams.set("callbackUrl", nextUrl.pathname)
     return NextResponse.redirect(loginUrl)

@@ -26,7 +26,7 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4"
+            className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4"
           >
             Simple, transparent pricing
           </motion.h2>
@@ -61,7 +61,7 @@ export default function Pricing() {
               <div className="text-center mb-8">
                 <div className="text-lg font-bold text-gray-900 mb-1">Treelivine ERP Demo</div>
                 <div className="flex items-end justify-center gap-1 mt-4">
-                  <span className="text-6xl font-extrabold text-gray-900">FREE</span>
+                  <span className="text-5xl font-extrabold text-gray-900">FREE</span>
                 </div>
                 <div className="text-gray-400 text-sm mt-2">Full access — no credit card needed</div>
               </div>

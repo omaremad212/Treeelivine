@@ -71,6 +71,7 @@ interface HeaderProps {
     email?: string | null
     image?: string | null
     role?: string
+    isDemo?: boolean
   }
 }
 
