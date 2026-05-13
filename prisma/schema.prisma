@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  ACCOUNTANT
+  STAFF
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  REFUND
+  TRANSFER
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          Role           @default(STAFF)
+  avatar        String?
+  phone         String?
+  department    String?
+  isActive      Boolean        @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+  orders        Order[]
+
+  @@map("users")
+}
+
+model Customer {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  phone        String?
+  company      String?
+  address      String?
+  city         String?
+  country      String?
+  status       CustomerStatus @default(ACTIVE)
+  totalOrders  Int            @default(0)
+  totalSpent   Float          @default(0)
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  orders       Order[]
+
+  @@map("customers")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  slug        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String        @id @default(cuid())
+  name         String
+  sku          String        @unique
+  description  String?
+  price        Float
+  costPrice    Float
+  stock        Int           @default(0)
+  minStock     Int           @default(10)
+  unit         String        @default("pcs")
+  status       ProductStatus @default(ACTIVE)
+  image        String?
+  categoryId   String?
+  supplierId   String?
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("products")
+}
+
+model Supplier {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  company      String?
+  address      String?
+  city         String?
+  country      String?
+  website      String?
+  notes        String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+
+  @@map("suppliers")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  customerId   String
+  userId       String
+  status       OrderStatus @default(PENDING)
+  subtotal     Float
+  tax          Float       @default(0)
+  discount     Float       @default(0)
+  total        Float
+  notes        String?
+  shippingAddr String?
+  paidAt       DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  customer     Customer    @relation(fields: [customerId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
+  items        OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  amount      Float
+  description String
+  category    String?
+  reference   String?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("transactions")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model File {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  size        Int
+  mimeType    String
+  entityType  String?
+  entityId    String?
+  uploadedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@map("files")
+}
