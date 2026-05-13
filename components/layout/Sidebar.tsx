@@ -77,6 +77,7 @@ interface SidebarProps {
     email?: string | null
     image?: string | null
     role?: string
+    isDemo?: boolean
   }
 }
 

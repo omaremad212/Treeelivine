@@ -12,7 +12,7 @@ const highlights = [
 
 export default function Hero() {
   return (
-    <section className="relative pt-24 pb-20 overflow-hidden bg-white">
+    <section className="relative pt-28 sm:pt-32 pb-20 overflow-hidden bg-white">
       {/* Subtle background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-32 w-[600px] h-[600px] rounded-full bg-purple-50 opacity-60 blur-3xl" />
@@ -38,7 +38,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-[1.08] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-[1.1] tracking-tight mb-6"
           >
             Run Your Entire{" "}
             <span className="purple-gradient-text">Business</span>
@@ -53,7 +53,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto mb-10"
+            className="text-base sm:text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto mb-10"
           >
             Treelivine ERP helps businesses manage sales, inventory, finance,
             customers, suppliers, and reports from one modern dashboard.
