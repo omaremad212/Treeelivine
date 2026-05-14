@@ -38,16 +38,11 @@ const Icons = {
   Briefcase: () => <Icon d={['M20 7H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z', 'M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2']} />,
 }
 
-/* ── Brand logo SVG ──────────────────────────────────────────────────── */
+/* ── Brand logo image ────────────────────────────────────────────────── */
 function BrandMark({ size = 24 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="currentColor">
-      <path d="M32 12 C 32 28, 32 44, 32 56" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      <path d="M32 22 C 24 21, 16 17, 12 11 C 18 12, 26 16, 32 22 Z" />
-      <path d="M32 30 C 40 30, 48 27, 52 21 C 46 22, 38 25, 32 30 Z" />
-      <path d="M32 40 C 26 41, 20 39, 16 34 C 21 35, 27 36, 32 40 Z" />
-      <ellipse cx="36" cy="48" rx="3.2" ry="4.2" transform="rotate(20 36 48)" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/logo.png" alt="Treeelivine" width={size} height={size} style={{ objectFit: 'contain' }} />
   )
 }
 
