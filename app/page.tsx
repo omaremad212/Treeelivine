@@ -93,7 +93,7 @@ function ModuleBadge({ iconKey, name, desc }: { iconKey: string; name: string; d
 /* ── Testimonial ──────────────────────────────────────────────────────── */
 function TestimonialCard({ quote, name, role, initials }: { quote: string; name: string; role: string; initials: string }) {
   return (
-    <div className="fade-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24 }}>
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24 }}>
       <div style={{ fontSize: 32, color: 'var(--brand-primary)', lineHeight: 1, marginBottom: 16, opacity: 0.4 }}>"</div>
       <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>{quote}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
