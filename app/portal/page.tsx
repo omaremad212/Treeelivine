@@ -19,7 +19,17 @@ export default function PortalDashboard() {
   }, [])
 
   if (loading) return <LoadingSpinner />
-  if (!data) return <p style={{ color: 'var(--text-muted)' }}>Could not load portal data</p>
+  if (!data) return (
+    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+      <div style={{ fontSize: 48, marginBottom: '1rem' }}>🌿</div>
+      <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--fg-1)', marginBottom: '0.5rem' }}>
+        {t.welcomePortal || 'Welcome to your Client Portal'}
+      </h2>
+      <p style={{ color: 'var(--fg-4)', fontSize: '0.875rem', maxWidth: 400, margin: '0 auto' }}>
+        Your account is being set up. Please contact your account manager to get access to your projects and invoices.
+      </p>
+    </div>
+  )
 
   const activeProjects = (data.projects || []).filter((p: any) => p.status === 'active').length
   const unpaidInvoices = (data.invoices || []).filter((i: any) => i.status !== 'paid').length

@@ -6,18 +6,32 @@ import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name, role } = await req.json()
+    const { email, password, name, role, phone, company } = await req.json()
     if (!email || !password) return Response.json({ success: false, message: 'Missing fields' }, { status: 400 })
 
     const { data: existing } = await supabase.from('users').select('id').eq('email', email.toLowerCase()).single()
     if (existing) return Response.json({ success: false, message: 'Email already exists' }, { status: 409 })
 
     const hash = await bcrypt.hash(password, 10)
+    const userRole = role || 'client'
     const { data: user, error } = await supabase.from('users').insert({
-      email: email.toLowerCase(), password: hash, name, role: role || 'client'
+      email: email.toLowerCase(), password: hash, name, role: userRole
     }).select().single()
 
     if (error || !user) return Response.json({ success: false, message: 'Failed to create user' }, { status: 500 })
+
+    /* Auto-create a customer record for client accounts */
+    if (userRole === 'client') {
+      await supabase.from('customers').insert({
+        user_id: user.id,
+        name: name || email,
+        email: email.toLowerCase(),
+        phone: phone || null,
+        company: company || null,
+        status: 'active',
+        priority: 'medium',
+      })
+    }
 
     const token = signToken(user.id)
     const cookieStore = cookies()
