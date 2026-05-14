@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
+import { getAuthUser, unauthorizedResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { toApi } from '@/lib/utils'
 
@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const body = await req.json()
   const { customerId, projectId, status, currency, items, taxRate, validUntil, notes } = body

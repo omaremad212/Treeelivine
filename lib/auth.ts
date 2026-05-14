@@ -91,6 +91,10 @@ export function forbiddenResponse() {
   return Response.json({ success: false, message: 'Permission denied' }, { status: 403 })
 }
 
+export function demoReadOnlyResponse() {
+  return Response.json({ success: false, message: 'Demo mode is read-only. Create a free account to make changes.' }, { status: 403 })
+}
+
 export function cookieOptions() {
   return {
     httpOnly: true,
