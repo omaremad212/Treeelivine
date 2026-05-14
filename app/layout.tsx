@@ -14,6 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+        <meta name="theme-color" content="#4f6831" />
       </head>
       <body>
         <AppProvider>{children}</AppProvider>

@@ -1090,3 +1090,140 @@ code, kbd, pre {
 .animate-fade-up  { animation: fadeUp  var(--dur-slow) var(--ease-out); }
 .animate-float    { animation: float 5s ease-in-out infinite; }
 .animate-pulse-dot { animation: pulseDot 2.5s ease-in-out infinite; }
+
+/* ======================================================================= */
+/* RESPONSIVE                                                               */
+/* ======================================================================= */
+
+/* ---- Sidebar overlay (mobile) --------------------------------------- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  z-index: 45;
+  animation: fadeIn var(--dur-base) var(--ease-out);
+}
+
+/* ---- Mobile hamburger button (hidden on desktop) -------------------- */
+.menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.menu-btn:hover { background: var(--bg-surface-2); color: var(--fg-1); }
+
+/* ---- App shell main area -------------------------------------------- */
+.app-main {
+  flex: 1;
+  margin-inline-start: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- Table scroll wrapper ------------------------------------------- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll .t-table {
+  min-width: 560px;
+}
+
+/* ============================================================ */
+/* Tablet & smaller (< 1024px) — compact sidebar               */
+/* ============================================================ */
+@media (max-width: 1023px) {
+  :root {
+    --sidebar-w: 220px;
+  }
+}
+
+/* ============================================================ */
+/* Mobile (< 768px) — overlay sidebar                          */
+/* ============================================================ */
+@media (max-width: 767px) {
+  :root {
+    --sidebar-w: 260px;
+  }
+
+  /* Sidebar becomes a fixed overlay — hidden by default */
+  .sidebar {
+    /* RTL: sidebar sits at inline-start (right in Arabic). Hide it by pushing right. */
+    transform: translateX(100%);
+    transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out);
+    box-shadow: none;
+  }
+  [dir="ltr"] .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar[data-open="true"] {
+    transform: translateX(0) !important;
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Show overlay when sidebar is open */
+  .sidebar-overlay[data-open="true"] {
+    display: block;
+  }
+
+  /* Main content fills full width */
+  .app-main {
+    margin-inline-start: 0 !important;
+  }
+
+  /* Show hamburger */
+  .menu-btn { display: flex; }
+
+  /* Hide search bar shortcut hint on mobile */
+  .search-bar span { display: none; }
+
+  /* Narrower search on mobile */
+  .search-bar { max-width: 180px; }
+
+  /* Reduce page padding */
+  .page-content { padding: var(--space-4) !important; }
+  .page-header  { padding: var(--space-3) var(--space-4) !important; }
+
+  /* KPI grid: 2 cols on mobile */
+  .grid-kpi { grid-template-columns: repeat(2, 1fr); }
+
+  /* Card grid: single col */
+  .grid-cards { grid-template-columns: 1fr; }
+
+  /* Modal: full screen-ish on mobile */
+  .modal { max-width: calc(100vw - 2rem); max-height: 92vh; }
+  .modal-body { padding: var(--space-4) var(--space-4); }
+  .modal-header { padding: var(--space-4); }
+  .modal-footer { padding: var(--space-3) var(--space-4); }
+
+  /* Page header: allow wrap on very small screens */
+  .page-header { flex-wrap: wrap; gap: var(--space-2); }
+
+  /* Toolbar: wrap actions */
+  .toolbar { flex-wrap: wrap; gap: var(--space-2); }
+}
+
+/* ============================================================ */
+/* Extra small (< 480px)                                       */
+/* ============================================================ */
+@media (max-width: 479px) {
+  .grid-kpi { grid-template-columns: 1fr; }
+
+  /* Topbar: hide language toggle label */
+  .lang-label { display: none; }
+
+  /* Reduce topbar padding */
+  .topbar { padding: 0 var(--space-3); gap: var(--space-2); }
+}
