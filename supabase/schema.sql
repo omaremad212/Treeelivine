@@ -181,6 +181,49 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- ─────────────────────────────────────────
+-- SUPPORT TICKETS
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  ticket_number TEXT UNIQUE,
+  title         TEXT NOT NULL,
+  description   TEXT,
+  customer_id   UUID REFERENCES customers(id) ON DELETE SET NULL,
+  assigned_to   UUID REFERENCES employees(id) ON DELETE SET NULL,
+  status        TEXT DEFAULT 'open'
+                  CHECK (status IN ('open','in_progress','resolved','closed')),
+  priority      TEXT DEFAULT 'medium'
+                  CHECK (priority IN ('low','medium','high','urgent')),
+  resolved_at   TIMESTAMPTZ,
+  is_demo       BOOLEAN DEFAULT false,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ─────────────────────────────────────────
+-- QUOTATIONS
+-- ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS quotations (
+  id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  quote_number TEXT UNIQUE,
+  customer_id  UUID REFERENCES customers(id) ON DELETE SET NULL,
+  project_id   UUID REFERENCES projects(id) ON DELETE SET NULL,
+  status       TEXT DEFAULT 'draft'
+                 CHECK (status IN ('draft','sent','accepted','rejected','expired')),
+  currency     TEXT DEFAULT 'SAR',
+  subtotal     NUMERIC DEFAULT 0,
+  tax_rate     NUMERIC DEFAULT 15,
+  tax_amount   NUMERIC DEFAULT 0,
+  total        NUMERIC DEFAULT 0,
+  items        JSONB DEFAULT '[]',
+  valid_until  TIMESTAMPTZ,
+  notes        TEXT,
+  is_demo      BOOLEAN DEFAULT false,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ─────────────────────────────────────────
 -- INDEXES for performance
 -- ─────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_customers_status     ON customers(status);
@@ -194,6 +237,10 @@ CREATE INDEX IF NOT EXISTS idx_invoices_status      ON invoices(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_customer    ON invoices(customer_id);
 CREATE INDEX IF NOT EXISTS idx_expenses_category    ON expenses(category);
 CREATE INDEX IF NOT EXISTS idx_expenses_salary      ON expenses(is_recurring_salary) WHERE is_recurring_salary = true;
+CREATE INDEX IF NOT EXISTS idx_tickets_status       ON support_tickets(status);
+CREATE INDEX IF NOT EXISTS idx_tickets_customer     ON support_tickets(customer_id);
+CREATE INDEX IF NOT EXISTS idx_quotations_status    ON quotations(status);
+CREATE INDEX IF NOT EXISTS idx_quotations_customer  ON quotations(customer_id);
 
 -- ─────────────────────────────────────────
 -- updated_at auto-update trigger
@@ -205,7 +252,7 @@ $$ LANGUAGE plpgsql;
 
 DO $$ DECLARE t TEXT;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['users','employees','customers','projects','tasks','invoices','expenses','templates','settings']
+  FOREACH t IN ARRAY ARRAY['users','employees','customers','projects','tasks','invoices','expenses','templates','settings','support_tickets','quotations']
   LOOP
     EXECUTE format('DROP TRIGGER IF EXISTS trg_updated_at ON %I; CREATE TRIGGER trg_updated_at BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION update_updated_at();', t, t);
   END LOOP;
@@ -254,4 +301,6 @@ ALTER TABLE tasks      DISABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices   DISABLE ROW LEVEL SECURITY;
 ALTER TABLE expenses   DISABLE ROW LEVEL SECURITY;
 ALTER TABLE templates  DISABLE ROW LEVEL SECURITY;
-ALTER TABLE settings   DISABLE ROW LEVEL SECURITY;
+ALTER TABLE settings        DISABLE ROW LEVEL SECURITY;
+ALTER TABLE support_tickets DISABLE ROW LEVEL SECURITY;
+ALTER TABLE quotations      DISABLE ROW LEVEL SECURITY;

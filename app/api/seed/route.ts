@@ -10,7 +10,7 @@ const DEMO_PASSWORD = 'demo1234'
 export async function POST(_req: NextRequest) {
   try {
     // Clean up existing demo data
-    for (const table of ['tasks','invoices','expenses','projects','templates','employees','customers','users']) {
+    for (const table of ['tasks','invoices','expenses','quotations','support_tickets','projects','templates','employees','customers','users']) {
       await supabase.from(table).delete().eq('is_demo', true)
     }
 
@@ -74,6 +74,47 @@ export async function POST(_req: NextRequest) {
         { description: 'راتب سارة الشهري', category: 'salary', amount: 6000, employee_id: employees[1].id, is_recurring_salary: true, salary_next_due_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(), is_demo: true },
         { description: 'فاتورة الإنترنت', category: 'utilities', amount: 500, is_demo: true },
         { description: 'اشتراك Adobe Creative Cloud', category: 'software', amount: 350, is_demo: true },
+      ])
+    }
+
+    // Create demo support tickets
+    if (customers?.length && employees?.length) {
+      await supabase.from('support_tickets').insert([
+        { ticket_number: 'TKT-0001', title: 'موقع الشركة لا يعمل', description: 'الصفحة الرئيسية لا تستجيب منذ اليوم الصباح', customer_id: customers[0].id, assigned_to: employees[0].id, status: 'open', priority: 'urgent', is_demo: true },
+        { ticket_number: 'TKT-0002', title: 'طلب تعديل على الشعار', description: 'نحتاج تعديل في لون الشعار وفق الهوية الجديدة', customer_id: customers[1].id, assigned_to: employees[1].id, status: 'in_progress', priority: 'medium', is_demo: true },
+        { ticket_number: 'TKT-0003', title: 'مشكلة في التقارير الشهرية', description: 'التقارير لا تعكس الأرقام الصحيحة للشهر الماضي', customer_id: customers[2].id, assigned_to: employees[3].id, status: 'resolved', priority: 'high', is_demo: true },
+        { ticket_number: 'TKT-0004', title: 'طلب تدريب على النظام', description: 'نحتاج جلسة تدريبية للموظفين الجدد', customer_id: customers[0].id, assigned_to: null, status: 'open', priority: 'low', is_demo: true },
+        { ticket_number: 'TKT-0005', title: 'خطأ في فاتورة INV-2024-002', description: 'المبلغ في الفاتورة يختلف عما تم الاتفاق عليه', customer_id: customers[2].id, assigned_to: employees[0].id, status: 'in_progress', priority: 'high', is_demo: true },
+      ])
+    }
+
+    // Create demo quotations
+    if (customers?.length) {
+      const validDate = new Date()
+      validDate.setDate(validDate.getDate() + 30)
+      const validStr = validDate.toISOString()
+      await supabase.from('quotations').insert([
+        {
+          quote_number: 'QT-2024-001', customer_id: customers[0].id,
+          status: 'accepted', currency: 'SAR',
+          items: [{ description: 'إدارة السوشيال ميديا - 3 أشهر', qty: 3, price: 4000 }, { description: 'تصميم محتوى بصري', qty: 1, price: 2000 }],
+          subtotal: 14000, tax_rate: 15, tax_amount: 2100, total: 16100,
+          valid_until: validStr, notes: 'يشمل 3 منصات تواصل اجتماعي', is_demo: true,
+        },
+        {
+          quote_number: 'QT-2024-002', customer_id: customers[1].id,
+          status: 'sent', currency: 'SAR',
+          items: [{ description: 'تصميم الهوية البصرية الكاملة', qty: 1, price: 12000 }, { description: 'دليل استخدام الهوية', qty: 1, price: 3000 }],
+          subtotal: 15000, tax_rate: 15, tax_amount: 2250, total: 17250,
+          valid_until: validStr, is_demo: true,
+        },
+        {
+          quote_number: 'QT-2024-003', customer_id: customers[3].id,
+          status: 'draft', currency: 'SAR',
+          items: [{ description: 'استراتيجية تسويق رقمي - سنة', qty: 1, price: 35000 }],
+          subtotal: 35000, tax_rate: 15, tax_amount: 5250, total: 40250,
+          valid_until: validStr, is_demo: true,
+        },
       ])
     }
 
