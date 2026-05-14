@@ -1,21 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Task from '@/models/Task'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'tasks.write')) return forbiddenResponse()
-  await connectDB()
+
   const { newAssigneeId, note } = await req.json()
-  if (!newAssigneeId) return NextResponse.json({ success: false, message: 'newAssigneeId is required' }, { status: 400 })
-  const task = await Task.findById(params.id)
-  if (!task) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  const prev = task.currentAssigneeId
-  task.currentAssigneeId = newAssigneeId
-  task.history = task.history || []
-  task.history.push({ action: 'handover', by: (user as any)._id, from: prev, to: newAssigneeId, note, at: new Date() })
-  await task.save()
-  return NextResponse.json({ success: true, data: task })
+  if (!newAssigneeId) return Response.json({ success: false, message: 'newAssigneeId is required' }, { status: 400 })
+
+  const { data: task } = await supabase.from('tasks').select('*').eq('id', params.id).single()
+  if (!task) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+
+  const history = Array.isArray(task.history) ? task.history : []
+  const { data, error } = await supabase.from('tasks').update({
+    current_assignee_id: newAssigneeId,
+    history: [...history, { action: 'handover', by: user.id, from: task.current_assignee_id, to: newAssigneeId, note, at: new Date().toISOString() }],
+  }).eq('id', params.id).select().single()
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data) })
 }

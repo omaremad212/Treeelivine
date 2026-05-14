@@ -1,35 +1,56 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Invoice from '@/models/Invoice'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.read')) return forbiddenResponse()
-  await connectDB()
-  const invoice = await Invoice.findById(params.id)
-    .populate('customerId', 'name email company phone address')
-    .populate('projectId', 'name')
-  if (!invoice) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  return NextResponse.json({ success: true, data: invoice })
+
+  const { data } = await supabase.from('invoices')
+    .select('*, customer:customers(id,name,email,company,phone), project:projects(id,name)')
+    .eq('id', params.id).single()
+  if (!data) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+  return Response.json({ success: true, data: toApi(data) })
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.write')) return forbiddenResponse()
-  await connectDB()
-  const invoice = await Invoice.findByIdAndUpdate(params.id, await req.json(), { new: true, runValidators: true })
-  if (!invoice) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  return NextResponse.json({ success: true, data: invoice })
+
+  const body = await req.json()
+  const updates: any = {}
+  if (body.status !== undefined) updates.status = body.status
+  if (body.currency !== undefined) updates.currency = body.currency
+  if (body.taxRate !== undefined) updates.tax_rate = body.taxRate
+  if (body.tax_rate !== undefined) updates.tax_rate = body.tax_rate
+  if (body.taxAmount !== undefined) updates.tax_amount = body.taxAmount
+  if (body.subtotal !== undefined) updates.subtotal = body.subtotal
+  if (body.amount !== undefined) updates.amount = body.amount
+  if (body.paidAmount !== undefined) updates.paid_amount = body.paidAmount
+  if (body.paid_amount !== undefined) updates.paid_amount = body.paid_amount
+  if (body.remainingAmount !== undefined) updates.remaining_amount = body.remainingAmount
+  if (body.dueDate !== undefined) updates.due_date = body.dueDate
+  if (body.notes !== undefined) updates.notes = body.notes
+  if (body.items !== undefined) updates.items = body.items
+  if (body.invoiceNumber !== undefined) updates.invoice_number = body.invoiceNumber
+  if (body.customerId !== undefined) updates.customer_id = body.customerId
+  if (body.projectId !== undefined) updates.project_id = body.projectId
+
+  const { data, error } = await supabase.from('invoices').update(updates).eq('id', params.id).select().single()
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  if (!data) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+  return Response.json({ success: true, data: toApi(data) })
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.write')) return forbiddenResponse()
-  await connectDB()
-  await Invoice.findByIdAndDelete(params.id)
-  return NextResponse.json({ success: true })
+
+  const { error } = await supabase.from('invoices').delete().eq('id', params.id)
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true })
 }

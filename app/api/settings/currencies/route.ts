@@ -1,24 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Setting from '@/models/Setting'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  await connectDB()
-  const settings = await Setting.getOrCreate()
-  return NextResponse.json({ success: true, data: settings.currencies || [] })
+
+  const { data } = await supabase.from('settings').select('currencies').limit(1).single()
+  return Response.json({ success: true, data: data?.currencies || [] })
 }
 
 export async function PUT(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'settings.write')) return forbiddenResponse()
-  await connectDB()
+
   const { currencies } = await req.json()
-  const settings = await Setting.getOrCreate()
-  settings.currencies = currencies
-  await settings.save()
-  return NextResponse.json({ success: true, data: settings.currencies })
+  const { data: settings } = await supabase.from('settings').select('id').limit(1).single()
+  if (!settings) return Response.json({ success: false, message: 'Settings not found' }, { status: 500 })
+
+  const { data, error } = await supabase.from('settings').update({ currencies }).eq('id', settings.id).select('currencies').single()
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: data?.currencies })
 }
