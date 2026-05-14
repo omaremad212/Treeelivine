@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '@/contexts/AppContext'
@@ -86,6 +86,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout, hasPermission, lang, setLang, theme, setTheme } = useApp()
   const router = useRouter()
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) router.replace('/login')
@@ -111,8 +112,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg-app)' }}>
+      {/* ── Mobile overlay ─────────────────────────────────────── */}
+      <div
+        className="sidebar-overlay"
+        data-open={sidebarOpen}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* ── Sidebar ────────────────────────────────────────────── */}
-      <aside className="sidebar">
+      <aside className="sidebar" data-open={sidebarOpen}>
         {/* Brand */}
         <div className="brand">
           <span className="brand-icon"><BrandMark size={22} /></span>
@@ -134,6 +143,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       key={item.href}
                       href={item.href}
                       className={`nav-item${isActive ? ' active' : ''}`}
+                      onClick={() => setSidebarOpen(false)}
                     >
                       <item.Icon />
                       <span>{isAr ? item.labelAr : item.labelEn}</span>
@@ -164,16 +174,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ── Main content (offset by sidebar width) ────────────── */}
-      <div style={{
-        flex: 1,
-        marginInlineStart: 'var(--sidebar-w)',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        overflow: 'hidden',
-      }}>
+      <div className="app-main">
         {/* Topbar */}
         <header className="topbar">
+          {/* Mobile: hamburger */}
+          <button
+            className="menu-btn"
+            onClick={() => setSidebarOpen(v => !v)}
+            aria-label="Toggle menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          </button>
+
           {/* Search */}
           <div className="search-bar" style={{ flex: 1, maxWidth: 340 }}>
             <Icons.Search />
