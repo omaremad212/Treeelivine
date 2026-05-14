@@ -53,12 +53,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [lang, setLangState] = useState('ar')
-  const [theme, setThemeState] = useState('dark')
+  const [theme, setThemeState] = useState('light')
   const [settings, setSettings] = useState<any>(null)
 
   useEffect(() => {
     const savedLang = localStorage.getItem('lang') || 'ar'
-    const savedTheme = localStorage.getItem('theme') || 'dark'
+    const savedTheme = localStorage.getItem('theme') || 'light'
     setLangState(savedLang)
     setThemeState(savedTheme)
     document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr'

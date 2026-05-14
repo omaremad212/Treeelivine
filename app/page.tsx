@@ -122,57 +122,88 @@ function DashboardMockup() {
   )
 }
 
+/* ── Clean SVG icons (Lucide line style) ─────────────────────────────── */
+function Ico({ d, size = 22 }: { d: string | string[]; size?: number }) {
+  const paths = Array.isArray(d) ? d : [d]
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      {paths.map((p, i) => <path key={i} d={p} />)}
+    </svg>
+  )
+}
+const FeatureIcons: Record<string, React.ReactNode> = {
+  crm:      <Ico d={['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2','M23 21v-2a4 4 0 00-3-3.87','M16 3.13a4 4 0 010 7.75','M9 11a4 4 0 100-8 4 4 0 000 8z']} />,
+  projects: <Ico d={['M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z']} />,
+  tasks:    <Ico d={['M9 11l3 3L22 4','M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11']} />,
+  finance:  <Ico d={['M12 2v20','M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6']} />,
+  analytics:<Ico d={['M3 3v18h18','M18 9l-5 5-2-2-4 4']} />,
+  roles:    <Ico d={['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z']} />,
+}
+const ModuleIcons: Record<string, React.ReactNode> = {
+  dashboard: <Ico size={20} d={['M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z','M9 22V12h6v10']} />,
+  crm:       <Ico size={20} d={['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2','M9 11a4 4 0 100-8 4 4 0 000 8z']} />,
+  projects:  <Ico size={20} d={['M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z']} />,
+  tasks:     <Ico size={20} d={['M9 11l3 3L22 4','M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11']} />,
+  team:      <Ico size={20} d={['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2','M23 21v-2a4 4 0 00-3-3.87','M16 3.13a4 4 0 010 7.75','M9 11a4 4 0 100-8 4 4 0 000 8z']} />,
+  finance:   <Ico size={20} d={['M20 12V22H4V12','M22 7H2v5h20V7z','M12 22V7','M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z','M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z']} />,
+  templates: <Ico size={20} d={['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z','M14 2v6h6','M16 13H8M16 17H8M10 9H8']} />,
+  settings:  <Ico size={20} d={['M12 15a3 3 0 100-6 3 3 0 000 6z','M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z']} />,
+  portal:    <Ico size={20} d={['M12 2a10 10 0 100 20A10 10 0 0012 2z','M2 12h20','M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z']} />,
+}
+
 /* ── Feature card ────────────────────────────────────────────────────── */
-function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+function FeatureCard({ iconKey, title, desc }: { iconKey: string; title: string; desc: string }) {
   return (
     <div style={{
-      background: 'var(--bg-surface)',
-      border: '1px solid var(--border-2)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-6)',
-      transition: 'box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out)',
+      background: '#ffffff',
+      border: '1px solid #e6e2d9',
+      borderRadius: '12px',
+      padding: '24px',
+      transition: 'box-shadow 180ms ease, border-color 180ms ease',
     }}
     onMouseEnter={e => {
-      (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-md)'
-      ;(e.currentTarget as HTMLDivElement).style.borderColor = 'var(--brand-olive-200)'
+      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 12px rgba(23,22,19,0.06)'
+      ;(e.currentTarget as HTMLDivElement).style.borderColor = '#c9d6ac'
     }}
     onMouseLeave={e => {
       (e.currentTarget as HTMLDivElement).style.boxShadow = ''
-      ;(e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-2)'
+      ;(e.currentTarget as HTMLDivElement).style.borderColor = '#e6e2d9'
     }}
     >
       <div style={{
-        width: 44, height: 44, borderRadius: 'var(--radius-md)',
-        background: 'var(--brand-olive-50)',
+        width: 44, height: 44, borderRadius: '8px',
+        background: '#f3f6ee',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 22, marginBottom: 'var(--space-4)',
-        flexShrink: 0,
+        color: '#4f6831', marginBottom: '16px', flexShrink: 0,
       }}>
-        {icon}
+        {FeatureIcons[iconKey]}
       </div>
-      <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 'var(--fw-semibold)', color: 'var(--fg-1)', marginBottom: 'var(--space-2)' }}>{title}</h3>
-      <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--fg-4)', lineHeight: 1.65 }}>{desc}</p>
+      <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#292723', marginBottom: '8px' }}>{title}</h3>
+      <p style={{ fontSize: '13px', color: '#75705f', lineHeight: 1.65 }}>{desc}</p>
     </div>
   )
 }
 
 /* ── Module badge ────────────────────────────────────────────────────── */
-function ModuleBadge({ icon, name, desc }: { icon: string; name: string; desc: string }) {
+function ModuleBadge({ iconKey, name, desc }: { iconKey: string; name: string; desc: string }) {
   return (
     <div style={{
-      background: 'var(--bg-surface)',
-      border: '1px solid var(--border-2)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-5)',
+      background: '#ffffff',
+      border: '1px solid #e6e2d9',
+      borderRadius: '12px',
+      padding: '20px',
       textAlign: 'center',
-      transition: 'border-color var(--dur-base) var(--ease-out)',
+      transition: 'border-color 180ms ease',
     }}
-    onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--brand-olive-300)'}
-    onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-2)'}
+    onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = '#a9bd80'}
+    onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = '#e6e2d9'}
     >
-      <div style={{ fontSize: 28, marginBottom: 'var(--space-2)' }}>{icon}</div>
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--fg-1)', marginBottom: 2 }}>{name}</div>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-4)' }}>{desc}</div>
+      <div style={{ color: '#4f6831', display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+        {ModuleIcons[iconKey]}
+      </div>
+      <div style={{ fontSize: '13px', fontWeight: 600, color: '#292723', marginBottom: 2 }}>{name}</div>
+      <div style={{ fontSize: '11px', color: '#75705f' }}>{desc}</div>
     </div>
   )
 }
@@ -180,24 +211,14 @@ function ModuleBadge({ icon, name, desc }: { icon: string; name: string; desc: s
 /* ── Testimonial card ────────────────────────────────────────────────── */
 function TestimonialCard({ quote, name, role, initials }: { quote: string; name: string; role: string; initials: string }) {
   return (
-    <div style={{
-      background: 'var(--bg-surface)',
-      border: '1px solid var(--border-2)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-6)',
-    }}>
-      <div style={{ fontSize: 32, color: 'var(--brand-primary)', lineHeight: 1, marginBottom: 'var(--space-4)', opacity: 0.5 }}>"</div>
-      <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 'var(--space-5)' }}>{quote}</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <div style={{
-          width: 38, height: 38, borderRadius: '50%',
-          background: 'var(--brand-primary)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontWeight: 700, fontSize: 'var(--fs-sm)', flexShrink: 0,
-        }}>{initials}</div>
+    <div style={{ background: '#ffffff', border: '1px solid #e6e2d9', borderRadius: '12px', padding: '24px' }}>
+      <div style={{ fontSize: 32, color: '#4f6831', lineHeight: 1, marginBottom: '16px', opacity: 0.4 }}>"</div>
+      <p style={{ fontSize: '13px', color: '#57534a', lineHeight: 1.7, marginBottom: '20px' }}>{quote}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#4f6831', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>{initials}</div>
         <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--fg-1)' }}>{name}</div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-4)' }}>{role}</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: '#292723' }}>{name}</div>
+          <div style={{ fontSize: '11px', color: '#75705f' }}>{role}</div>
         </div>
       </div>
     </div>
@@ -208,22 +229,21 @@ function TestimonialCard({ quote, name, role, initials }: { quote: string; name:
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{ border: '1px solid var(--border-2)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--bg-surface)' }}>
+    <div style={{ border: '1px solid #e6e2d9', borderRadius: '8px', overflow: 'hidden', background: '#ffffff' }}>
       <button
         onClick={() => setOpen(p => !p)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: 'var(--space-4) var(--space-5)',
-          background: 'none', border: 'none', color: 'var(--fg-1)',
-          fontSize: 'var(--fs-sm)', fontWeight: 'var(--fw-medium)', cursor: 'pointer', textAlign: 'start',
-          fontFamily: 'inherit', gap: 'var(--space-4)',
+          padding: '16px 20px', background: 'none', border: 'none', color: '#292723',
+          fontSize: '13px', fontWeight: 500, cursor: 'pointer', textAlign: 'start',
+          fontFamily: 'inherit', gap: '16px',
         }}
       >
         <span>{q}</span>
-        <span style={{ color: 'var(--brand-primary)', fontSize: 18, fontWeight: 300, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
+        <span style={{ color: '#4f6831', fontSize: 18, fontWeight: 300, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
       </button>
       {open && (
-        <div style={{ padding: '0 var(--space-5) var(--space-4)', color: 'var(--fg-3)', fontSize: 'var(--fs-sm)', lineHeight: 1.7 }}>{a}</div>
+        <div style={{ padding: '0 20px 16px', color: '#57534a', fontSize: '13px', lineHeight: 1.7 }}>{a}</div>
       )}
     </div>
   )
@@ -259,24 +279,24 @@ export default function LandingPage() {
   }
 
   const features = [
-    { icon: '👥', title: 'إدارة العملاء CRM', desc: 'تتبّع كل عميل من أول تواصل حتى إغلاق الصفقة، مع إدارة كاملة للحالة والأولوية والمسؤول.' },
-    { icon: '📁', title: 'إدارة المشاريع', desc: 'أسند المشاريع، تابع التقدم، وشارك البريف مع العملاء مباشرةً من منصة واحدة.' },
-    { icon: '✅', title: 'المهام والتسليمات', desc: 'نظام مهام مرن يربط الفريق بالمشاريع والعملاء، مع تتبع التقدم والمواعيد النهائية.' },
-    { icon: '💳', title: 'الفواتير والمالية', desc: 'أنشئ فواتير احترافية، تتبّع المدفوعات، وراقب المصروفات والأرباح في لوحة مالية موحدة.' },
-    { icon: '📊', title: 'تقارير وتحليلات', desc: 'لوحة مؤشرات حية توضح الإيرادات والأرباح والأداء — بأرقام حقيقية وفي الوقت الفعلي.' },
-    { icon: '🔐', title: 'صلاحيات وأدوار', desc: 'تحكّم في وصول كل مستخدم بدقة — أدمن، مدير، فريق، عميل — مع صلاحيات تفصيلية لكل وحدة.' },
+    { iconKey: 'crm',      title: 'إدارة العملاء CRM', desc: 'تتبّع كل عميل من أول تواصل حتى إغلاق الصفقة، مع إدارة كاملة للحالة والأولوية والمسؤول.' },
+    { iconKey: 'projects', title: 'إدارة المشاريع', desc: 'أسند المشاريع، تابع التقدم، وشارك البريف مع العملاء مباشرةً من منصة واحدة.' },
+    { iconKey: 'tasks',    title: 'المهام والتسليمات', desc: 'نظام مهام مرن يربط الفريق بالمشاريع والعملاء، مع تتبع التقدم والمواعيد النهائية.' },
+    { iconKey: 'finance',  title: 'الفواتير والمالية', desc: 'أنشئ فواتير احترافية، تتبّع المدفوعات، وراقب المصروفات والأرباح في لوحة مالية موحدة.' },
+    { iconKey: 'analytics',title: 'تقارير وتحليلات', desc: 'لوحة مؤشرات حية توضح الإيرادات والأرباح والأداء — بأرقام حقيقية وفي الوقت الفعلي.' },
+    { iconKey: 'roles',    title: 'صلاحيات وأدوار', desc: 'تحكّم في وصول كل مستخدم بدقة — أدمن، مدير، فريق، عميل — مع صلاحيات تفصيلية لكل وحدة.' },
   ]
 
   const modules = [
-    { icon: '📊', name: 'Dashboard', desc: 'لوحة التحكم' },
-    { icon: '👥', name: 'CRM', desc: 'إدارة العملاء' },
-    { icon: '📁', name: 'Projects', desc: 'المشاريع والبريف' },
-    { icon: '✅', name: 'Tasks', desc: 'المهام والتسليم' },
-    { icon: '🏢', name: 'Team', desc: 'الفريق والرواتب' },
-    { icon: '💰', name: 'Finance', desc: 'الفواتير والمالية' },
-    { icon: '📄', name: 'Templates', desc: 'قوالب جاهزة' },
-    { icon: '⚙️', name: 'Settings', desc: 'الإعدادات' },
-    { icon: '🌐', name: 'Client Portal', desc: 'بوابة العميل' },
+    { iconKey: 'dashboard', name: 'Dashboard', desc: 'لوحة التحكم' },
+    { iconKey: 'crm',       name: 'CRM', desc: 'إدارة العملاء' },
+    { iconKey: 'projects',  name: 'Projects', desc: 'المشاريع والبريف' },
+    { iconKey: 'tasks',     name: 'Tasks', desc: 'المهام والتسليم' },
+    { iconKey: 'team',      name: 'Team', desc: 'الفريق والرواتب' },
+    { iconKey: 'finance',   name: 'Finance', desc: 'الفواتير والمالية' },
+    { iconKey: 'templates', name: 'Templates', desc: 'قوالب جاهزة' },
+    { iconKey: 'settings',  name: 'Settings', desc: 'الإعدادات' },
+    { iconKey: 'portal',    name: 'Client Portal', desc: 'بوابة العميل' },
   ]
 
   const stats = [
@@ -300,22 +320,39 @@ export default function LandingPage() {
     { q: 'هل النظام مصمم للعربية؟', a: 'نعم، النظام عربي-أول مع دعم كامل للغة الإنجليزية، مع تصميم RTL أصيل وليس مجرد ترجمة.' },
   ]
 
+  /* Light-mode explicit values — landing page is always light regardless of user theme */
+  const L = {
+    bg:       '#faf7f1',
+    surface:  '#ffffff',
+    border:   '#e6e2d9',
+    border2:  '#d8d3c7',
+    fg1:      '#292723',
+    fg2:      '#3e3b34',
+    fg3:      '#57534a',
+    fg4:      '#75705f',
+    fg5:      '#98927f',
+    olive:    '#4f6831',
+    oliveL:   '#f3f6ee',
+    olive2:   '#e4ebd5',
+    navBg:    'rgba(255,255,255,0.92)',
+  }
+
   const sectionStyle: React.CSSProperties = { padding: 'clamp(56px, 8vw, 96px) clamp(16px, 5vw, 24px)', position: 'relative' }
   const containerStyle: React.CSSProperties = { maxWidth: 1200, margin: '0 auto' }
-  const sectionLabelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-xs)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--brand-primary)', marginBottom: 'var(--space-4)' }
+  const sectionLabelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: '16px' }
 
   return (
-    <div style={{ background: 'var(--bg-app)', color: 'var(--fg-2)', minHeight: '100vh', direction: 'rtl', overflowX: 'hidden' }}>
+    <div style={{ background: L.bg, color: L.fg2, minHeight: '100vh', direction: 'rtl', overflowX: 'hidden' }}>
       <style>{`
         html { scroll-behavior: smooth; }
-        .landing-nav-link { color: var(--fg-3); font-size: 14px; padding: 6px 12px; border-radius: 8px; text-decoration: none; transition: color 0.15s; }
-        .landing-nav-link:hover { color: var(--fg-1); text-decoration: none; }
-        .btn-hero-primary { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: var(--brand-primary); color: white; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; text-decoration: none; font-family: inherit; }
-        .btn-hero-primary:hover { background: var(--brand-primary-hover); box-shadow: 0 4px 16px rgba(79,104,49,0.28); text-decoration: none; color: white; }
-        .btn-hero-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: var(--bg-surface); color: var(--fg-1); border-radius: var(--radius-md); font-size: 15px; font-weight: 500; border: 1px solid var(--border-2); cursor: pointer; transition: background 0.15s, border-color 0.15s; text-decoration: none; font-family: inherit; }
-        .btn-hero-secondary:hover { background: var(--bg-surface-2); border-color: var(--border-3); text-decoration: none; color: var(--fg-1); }
-        .btn-hero-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: transparent; color: var(--fg-2); border-radius: var(--radius-md); font-size: 15px; font-weight: 500; border: 1px solid var(--border-1); cursor: pointer; transition: background 0.15s; text-decoration: none; font-family: inherit; }
-        .btn-hero-ghost:hover { background: var(--bg-hover); text-decoration: none; color: var(--fg-1); }
+        .landing-nav-link { color: ${L.fg4}; font-size: 14px; padding: 6px 12px; border-radius: 8px; text-decoration: none; transition: color 0.15s; }
+        .landing-nav-link:hover { color: ${L.fg1}; text-decoration: none; }
+        .btn-hero-primary { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: ${L.olive}; color: white; border-radius: 8px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; text-decoration: none; font-family: inherit; }
+        .btn-hero-primary:hover { background: #3d5128; box-shadow: 0 4px 16px rgba(79,104,49,0.28); text-decoration: none; color: white; }
+        .btn-hero-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: ${L.surface}; color: ${L.fg1}; border-radius: 8px; font-size: 15px; font-weight: 500; border: 1px solid ${L.border}; cursor: pointer; transition: background 0.15s; text-decoration: none; font-family: inherit; }
+        .btn-hero-secondary:hover { background: ${L.bg}; text-decoration: none; color: ${L.fg1}; }
+        .btn-hero-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; background: transparent; color: ${L.fg2}; border-radius: 8px; font-size: 15px; font-weight: 500; border: 1px solid ${L.border}; cursor: pointer; transition: background 0.15s; text-decoration: none; font-family: inherit; }
+        .btn-hero-ghost:hover { background: rgba(79,104,49,0.06); text-decoration: none; color: ${L.fg1}; }
         @media (max-width: 768px) {
           .hero-grid { grid-template-columns: 1fr !important; }
           .features-grid { grid-template-columns: 1fr !important; }
@@ -338,14 +375,14 @@ export default function LandingPage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 clamp(16px, 4vw, 40px)',
         transition: 'background 0.3s, border-bottom 0.3s, backdrop-filter 0.3s',
-        background: navScrolled ? 'var(--bg-surface)' : 'transparent',
-        borderBottom: navScrolled ? '1px solid var(--border-1)' : '1px solid transparent',
+        background: navScrolled ? L.navBg : 'transparent',
+        borderBottom: navScrolled ? `1px solid ${L.border}` : '1px solid transparent',
         backdropFilter: navScrolled ? 'blur(12px)' : 'none',
       }}>
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'var(--brand-primary)' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: L.olive }}>
           <BrandMark size={24} />
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--fg-1)', letterSpacing: '-0.01em' }}>treeelivine</span>
+          <span style={{ fontSize: 15, fontWeight: 600, color: L.fg1, letterSpacing: '-0.01em' }}>treeelivine</span>
         </Link>
 
         {/* Desktop nav links */}
@@ -381,19 +418,19 @@ export default function LandingPage() {
       <section style={{ ...sectionStyle, paddingTop: 'clamp(96px, 14vw, 140px)', paddingBottom: 'clamp(56px, 8vw, 80px)' }}>
         <div style={containerStyle}>
           {/* Live badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '4px 14px', borderRadius: 999, background: 'var(--status-active-bg)', border: '1px solid var(--brand-olive-100)', marginBottom: 'var(--space-6)' }}>
-            <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success-500)', display: 'inline-block' }} />
-            <span style={{ fontSize: 12, color: 'var(--success-700)', fontWeight: 500 }}>النظام يعمل الآن — جرّب بدون تسجيل</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '4px 14px', borderRadius: 999, background: '#ecf6ec', border: '1px solid #cfe8cf', marginBottom: '24px' }}>
+            <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#2f8a3e', display: 'inline-block' }} />
+            <span style={{ fontSize: 12, color: '#1b5024', fontWeight: 500 }}>النظام يعمل الآن — جرّب بدون تسجيل</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-16)', alignItems: 'center' }} className="hero-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }} className="hero-grid">
             {/* Left: copy */}
             <div>
-              <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: 800, lineHeight: 1.15, color: 'var(--fg-1)', letterSpacing: '-0.02em', marginBottom: 'var(--space-5)' }}>
+              <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: 800, lineHeight: 1.15, color: L.fg1, letterSpacing: '-0.02em', marginBottom: '20px' }}>
                 شغّل شركتك بالكامل<br />
-                <span style={{ color: 'var(--brand-primary)' }}>من منصة ERP واحدة</span>
+                <span style={{ color: L.olive }}>من منصة ERP واحدة</span>
               </h1>
-              <p style={{ fontSize: 'clamp(14px, 1.8vw, 17px)', color: 'var(--fg-3)', lineHeight: 1.75, marginBottom: 'var(--space-8)', maxWidth: 520 }}>
+              <p style={{ fontSize: 'clamp(14px, 1.8vw, 17px)', color: L.fg3, lineHeight: 1.75, marginBottom: '32px', maxWidth: 520 }}>
                 Treeelivine ERP يساعد فرقك على إدارة العملاء، المشاريع، المهام، الفواتير، والمالية من لوحة تحكم واحدة مصممة لوكالات التسويق.
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
@@ -408,8 +445,8 @@ export default function LandingPage() {
                 <Link href="/register" className="btn-hero-secondary">إنشاء حساب</Link>
                 <Link href="/login" className="btn-hero-ghost">تسجيل الدخول</Link>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--fg-5)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ color: 'var(--success-500)' }}>✓</span>
+              <p style={{ fontSize: 12, color: L.fg5, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ color: '#2f8a3e' }}>✓</span>
                 تجربة كاملة بدون إنشاء حساب — لا بطاقة ائتمانية
               </p>
             </div>
@@ -423,39 +460,39 @@ export default function LandingPage() {
       </section>
 
       {/* ── Divider line ─── */}
-      <div style={{ borderTop: '1px solid var(--border-1)' }} />
+      <div style={{ borderTop: `1px solid ${L.border}` }} />
 
       {/* ══════════════════════════════════════
           STATS STRIP
       ══════════════════════════════════════ */}
-      <section style={{ padding: 'var(--space-10) clamp(16px, 5vw, 24px)', background: 'var(--bg-surface)' }}>
-        <div style={{ ...containerStyle, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-6)', textAlign: 'center' }} className="stats-grid">
+      <section style={{ padding: '40px clamp(16px, 5vw, 24px)', background: L.surface }}>
+        <div style={{ ...containerStyle, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', textAlign: 'center' }} className="stats-grid">
           {stats.map((stat, i) => (
-            <div key={i} style={{ padding: 'var(--space-2) 0' }}>
-              <div style={{ fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: 'var(--brand-primary)', fontVariantNumeric: 'tabular-nums', marginBottom: 'var(--space-1)' }}>{stat.value}</div>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-4)' }}>{stat.label}</div>
+            <div key={i} style={{ padding: '8px 0' }}>
+              <div style={{ fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: L.olive, fontVariantNumeric: 'tabular-nums', marginBottom: 4 }}>{stat.value}</div>
+              <div style={{ fontSize: 12, color: L.fg4 }}>{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <div style={{ borderTop: '1px solid var(--border-1)' }} />
+      <div style={{ borderTop: `1px solid ${L.border}` }} />
 
       {/* ══════════════════════════════════════
           FEATURES
       ══════════════════════════════════════ */}
       <section id="features" style={sectionStyle}>
         <div style={containerStyle}>
-          <div style={{ marginBottom: 'var(--space-12)' }}>
+          <div style={{ marginBottom: '48px' }}>
             <div style={sectionLabelStyle}>المميزات</div>
-            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 700, color: 'var(--fg-1)', marginBottom: 'var(--space-3)', letterSpacing: '-0.01em' }}>
+            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 700, color: L.fg1, marginBottom: '12px', letterSpacing: '-0.01em' }}>
               كل ما تحتاجه لإدارة شركتك
             </h2>
-            <p style={{ fontSize: 'var(--fs-base)', color: 'var(--fg-3)', maxWidth: 560, lineHeight: 1.7 }}>
+            <p style={{ fontSize: '14px', color: L.fg3, maxWidth: 560, lineHeight: 1.7 }}>
               منصة متكاملة تجمع كل أدوات إدارة الأعمال في مكان واحد، مصممة خصيصاً لوكالات التسويق والشركات الخدمية.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-4)' }} className="features-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }} className="features-grid">
             {features.map((f, i) => <FeatureCard key={i} {...f} />)}
           </div>
         </div>
@@ -464,19 +501,18 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════
           MODULES
       ══════════════════════════════════════ */}
-      <section id="modules" style={{ ...sectionStyle, background: 'var(--bg-surface)' }}>
-        <div style={{ borderTop: '1px solid var(--border-1)', borderBottom: '1px solid var(--border-1)', position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+      <section id="modules" style={{ ...sectionStyle, background: L.surface, borderTop: `1px solid ${L.border}`, borderBottom: `1px solid ${L.border}` }}>
         <div style={containerStyle}>
-          <div style={{ marginBottom: 'var(--space-12)' }}>
+          <div style={{ marginBottom: '48px' }}>
             <div style={sectionLabelStyle}>الوحدات</div>
-            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 700, color: 'var(--fg-1)', marginBottom: 'var(--space-3)', letterSpacing: '-0.01em' }}>
+            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 700, color: L.fg1, marginBottom: '12px', letterSpacing: '-0.01em' }}>
               نظام متكامل من 9 وحدات
             </h2>
-            <p style={{ fontSize: 'var(--fs-base)', color: 'var(--fg-3)', maxWidth: 560, lineHeight: 1.7 }}>
+            <p style={{ fontSize: '14px', color: L.fg3, maxWidth: 560, lineHeight: 1.7 }}>
               كل وحدة مصممة لتحل مشكلة محددة وتتكامل مع باقي الوحدات لتجربة سلسة من البداية للنهاية.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 'var(--space-3)' }} className="modules-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px' }} className="modules-grid">
             {modules.map((m, i) => <ModuleBadge key={i} {...m} />)}
           </div>
         </div>
@@ -490,28 +526,28 @@ export default function LandingPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 'var(--space-12)',
+            gap: '48px',
             alignItems: 'center',
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border-2)',
-            borderRadius: 'var(--radius-xl)',
+            background: L.surface,
+            border: `1px solid ${L.border2}`,
+            borderRadius: '16px',
             padding: 'clamp(28px, 5vw, 56px)',
             position: 'relative',
             overflow: 'hidden',
           }} className="demo-grid">
             {/* Olive accent blob */}
-            <div style={{ position: 'absolute', top: -60, insetInlineEnd: -60, width: 240, height: 240, borderRadius: '50%', background: 'var(--brand-olive-50)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -60, insetInlineEnd: -60, width: 240, height: 240, borderRadius: '50%', background: L.oliveL, pointerEvents: 'none' }} />
 
             {/* Left: copy */}
             <div style={{ position: 'relative' }}>
-              <div style={{ ...sectionLabelStyle, marginBottom: 'var(--space-3)' }}>⚡ جرّب الآن</div>
-              <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: 'var(--fg-1)', marginBottom: 'var(--space-4)', lineHeight: 1.25, letterSpacing: '-0.01em' }}>
+              <div style={{ ...sectionLabelStyle, marginBottom: '12px' }}>⚡ جرّب الآن</div>
+              <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: L.fg1, marginBottom: '16px', lineHeight: 1.25, letterSpacing: '-0.01em' }}>
                 جرّب Treeelivine ERP<br />بدون إنشاء حساب
               </h2>
-              <p style={{ color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 'var(--space-6)', fontSize: 'var(--fs-sm)' }}>
+              <p style={{ color: L.fg3, lineHeight: 1.7, marginBottom: '24px', fontSize: '13px' }}>
                 بيانات تجريبية كاملة — عملاء، مشاريع، مهام، وفواتير — جاهزة فوراً.
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                 <button onClick={handleDemo} disabled={demoLoading} className="btn-hero-primary" style={{ opacity: demoLoading ? 0.7 : 1 }}>
                   {demoLoading ? '⏳ جاري الفتح...' : '🚀 ابدأ الديمو الآن'}
                 </button>
@@ -520,17 +556,17 @@ export default function LandingPage() {
             </div>
 
             {/* Right: demo credentials */}
-            <div style={{ background: 'var(--bg-surface-2)', border: '1px solid var(--border-1)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', position: 'relative' }}>
-              <div style={{ ...sectionLabelStyle, marginBottom: 'var(--space-4)' }}>بيانات الدخول التجريبية</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
+            <div style={{ background: L.bg, border: `1px solid ${L.border}`, borderRadius: '12px', padding: '20px', position: 'relative' }}>
+              <div style={{ ...sectionLabelStyle, marginBottom: '16px' }}>بيانات الدخول التجريبية</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
                 {[
                   { label: 'البريد الإلكتروني', value: 'demo@treeelivine.com' },
                   { label: 'كلمة المرور', value: 'demo1234' },
                   { label: 'الدور', value: 'Admin — صلاحيات كاملة' },
                 ].map((row, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-2) var(--space-3)', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-sm)' }}>
-                    <span style={{ color: 'var(--fg-4)' }}>{row.label}</span>
-                    <span style={{ color: 'var(--fg-1)', fontWeight: 600, direction: 'ltr', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-xs)' }}>{row.value}</span>
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: L.surface, borderRadius: '5px', fontSize: '13px' }}>
+                    <span style={{ color: L.fg4 }}>{row.label}</span>
+                    <span style={{ color: L.fg1, fontWeight: 600, direction: 'ltr', fontFamily: 'monospace', fontSize: '12px' }}>{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -550,14 +586,13 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════
           TESTIMONIALS
       ══════════════════════════════════════ */}
-      <section style={{ ...sectionStyle, background: 'var(--bg-surface)' }}>
-        <div style={{ borderTop: '1px solid var(--border-1)', borderBottom: '1px solid var(--border-1)', position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+      <section style={{ ...sectionStyle, background: L.surface, borderTop: `1px solid ${L.border}`, borderBottom: `1px solid ${L.border}` }}>
         <div style={containerStyle}>
-          <div style={{ marginBottom: 'var(--space-10)' }}>
+          <div style={{ marginBottom: '40px' }}>
             <div style={sectionLabelStyle}>آراء العملاء</div>
-            <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: 'var(--fg-1)', letterSpacing: '-0.01em' }}>ماذا يقول مستخدمونا</h2>
+            <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.01em' }}>ماذا يقول مستخدمونا</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-4)' }} className="testimonials-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }} className="testimonials-grid">
             {testimonials.map((t, i) => <TestimonialCard key={i} {...t} />)}
           </div>
         </div>
@@ -568,11 +603,11 @@ export default function LandingPage() {
       ══════════════════════════════════════ */}
       <section id="faq" style={sectionStyle}>
         <div style={containerStyle}>
-          <div style={{ marginBottom: 'var(--space-10)' }}>
+          <div style={{ marginBottom: '40px' }}>
             <div style={sectionLabelStyle}>الأسئلة الشائعة</div>
-            <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: 'var(--fg-1)', letterSpacing: '-0.01em' }}>أجوبة على أكثر الأسئلة شيوعاً</h2>
+            <h2 style={{ fontSize: 'clamp(20px, 2.8vw, 30px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.01em' }}>أجوبة على أكثر الأسئلة شيوعاً</h2>
           </div>
-          <div style={{ maxWidth: 680, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          <div style={{ maxWidth: 680, display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {faqs.map((faq, i) => <FAQItem key={i} {...faq} />)}
           </div>
         </div>
@@ -581,29 +616,29 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════
           FINAL CTA
       ══════════════════════════════════════ */}
-      <section style={{ ...sectionStyle, background: 'var(--brand-olive-600)' }}>
+      <section style={{ ...sectionStyle, background: '#4f6831' }}>
         <svg viewBox="0 0 600 300" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.06, pointerEvents: 'none' }} fill="white" preserveAspectRatio="xMidYMid slice">
           <path d="M 60 200 C 180 60, 380 80, 540 180 C 380 165, 250 175, 160 240 C 130 225, 90 218, 60 200 Z" />
           <path d="M 80 200 C 200 130, 340 140, 500 185" fill="none" stroke="white" strokeWidth="3" />
         </svg>
         <div style={{ ...containerStyle, textAlign: 'center', position: 'relative' }}>
-          <div style={{ display: 'inline-block', padding: '4px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', fontSize: 12, color: 'white', fontWeight: 500, marginBottom: 'var(--space-5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ display: 'inline-block', padding: '4px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', fontSize: 12, color: 'white', fontWeight: 500, marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             ابدأ الآن
           </div>
-          <h2 style={{ fontSize: 'clamp(22px, 4vw, 40px)', fontWeight: 800, color: 'white', marginBottom: 'var(--space-4)', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontSize: 'clamp(22px, 4vw, 40px)', fontWeight: 800, color: 'white', marginBottom: '16px', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
             جاهز لإدارة شركتك بذكاء؟
           </h2>
-          <p style={{ fontSize: 'clamp(14px, 1.8vw, 17px)', color: 'rgba(255,255,255,0.75)', maxWidth: 480, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 'clamp(14px, 1.8vw, 17px)', color: 'rgba(255,255,255,0.75)', maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.7 }}>
             انضم إلى المئات من الشركات التي تستخدم Treeelivine ERP لتبسيط عملياتها وزيادة إنتاجيتها.
           </p>
-          <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={handleDemo}
               disabled={demoLoading}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6, padding: '13px 28px',
-                background: 'white', color: 'var(--brand-primary)',
-                borderRadius: 'var(--radius-md)', fontSize: 15, fontWeight: 700,
+                background: 'white', color: '#4f6831',
+                borderRadius: '8px', fontSize: 15, fontWeight: 700,
                 border: 'none', cursor: 'pointer', opacity: demoLoading ? 0.7 : 1,
                 transition: 'opacity 0.15s', fontFamily: 'inherit',
               }}
@@ -613,9 +648,8 @@ export default function LandingPage() {
             <Link href="/register" style={{
               display: 'inline-flex', alignItems: 'center', gap: 6, padding: '13px 28px',
               background: 'rgba(255,255,255,0.15)', color: 'white',
-              borderRadius: 'var(--radius-md)', fontSize: 15, fontWeight: 600,
+              borderRadius: '8px', fontSize: 15, fontWeight: 600,
               border: '1px solid rgba(255,255,255,0.35)', textDecoration: 'none',
-              transition: 'background 0.15s',
             }}>
               إنشاء حساب
             </Link>
@@ -626,16 +660,16 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════
           FOOTER
       ══════════════════════════════════════ */}
-      <footer style={{ borderTop: '1px solid var(--border-1)', padding: 'var(--space-10) clamp(16px, 5vw, 24px) var(--space-8)', background: 'var(--bg-surface)' }}>
+      <footer style={{ borderTop: `1px solid ${L.border}`, padding: '40px clamp(16px, 5vw, 24px) 32px', background: L.surface }}>
         <div style={containerStyle}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 'var(--space-8)', marginBottom: 'var(--space-8)' }} className="footer-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '32px', marginBottom: '32px' }} className="footer-grid">
             {/* Brand */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-4)', color: 'var(--brand-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '16px', color: L.olive }}>
                 <BrandMark size={22} />
-                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--fg-1)', letterSpacing: '-0.01em' }}>treeelivine</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: L.fg1, letterSpacing: '-0.01em' }}>treeelivine</span>
               </div>
-              <p style={{ color: 'var(--fg-4)', fontSize: 'var(--fs-sm)', lineHeight: 1.7, maxWidth: 220 }}>
+              <p style={{ color: L.fg4, fontSize: '13px', lineHeight: 1.7, maxWidth: 220 }}>
                 منصة ERP متكاملة لإدارة وكالات التسويق والشركات الخدمية.
               </p>
             </div>
@@ -647,8 +681,8 @@ export default function LandingPage() {
               { title: 'الدعم', links: [{ label: 'سياسة الخصوصية', href: '/privacy' }, { label: 'الشروط والأحكام', href: '/terms' }, { label: 'الدعم الفني', href: '/support' }] },
             ].map((col, i) => (
               <div key={i}>
-                <p style={{ fontWeight: 600, fontSize: 'var(--fs-xs)', color: 'var(--fg-3)', marginBottom: 'var(--space-4)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-caps)' }}>{col.title}</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <p style={{ fontWeight: 600, fontSize: '11px', color: L.fg3, marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{col.title}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {col.links.map((link, j) => (
                     <a key={j} href={link.href} className="landing-nav-link" style={{ padding: 0 }}>{link.label}</a>
                   ))}
@@ -658,13 +692,13 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom bar */}
-          <div style={{ borderTop: '1px solid var(--border-1)', paddingTop: 'var(--space-5)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
-            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-5)' }}>© {new Date().getFullYear()} treeelivine ERP. جميع الحقوق محفوظة.</p>
-            <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+          <div style={{ borderTop: `1px solid ${L.border}`, paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <p style={{ fontSize: '12px', color: L.fg5 }}>© {new Date().getFullYear()} treeelivine ERP. جميع الحقوق محفوظة.</p>
+            <div style={{ display: 'flex', gap: '16px' }}>
               {[{ label: 'سياسة الخصوصية', href: '/privacy' }, { label: 'الشروط والأحكام', href: '/terms' }].map((link, i) => (
-                <a key={i} href={link.href} style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-5)', textDecoration: 'none', transition: 'color 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--fg-3)'}
-                  onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--fg-5)'}
+                <a key={i} href={link.href} style={{ fontSize: '12px', color: L.fg5, textDecoration: 'none' }}
+                  onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = L.fg3}
+                  onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = L.fg5}
                 >{link.label}</a>
               ))}
             </div>
