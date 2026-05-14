@@ -1,41 +1,59 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Expense from '@/models/Expense'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 import { syncRecurringSalaryExpenses } from '@/lib/salary-sync'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.read')) return forbiddenResponse()
-  await connectDB()
+
   await syncRecurringSalaryExpenses()
+
   const { searchParams } = new URL(req.url)
-  const query: any = {}
   const category = searchParams.get('category')
   const month = searchParams.get('month')
   const employeeId = searchParams.get('employeeId')
-  if (category) query.category = category
-  if (employeeId) query.employeeId = employeeId
+
+  let query = supabase.from('expenses')
+    .select('*, employee:employees(id,name,email,internal_role)')
+    .order('date', { ascending: false })
+
+  if (category) query = query.eq('category', category)
+  if (employeeId) query = query.eq('employee_id', employeeId)
   if (month) {
     const [y, m] = month.split('-').map(Number)
-    query.date = { $gte: new Date(y, m - 1, 1), $lt: new Date(y, m, 1) }
+    const start = new Date(y, m - 1, 1).toISOString()
+    const end = new Date(y, m, 1).toISOString()
+    query = query.gte('date', start).lt('date', end)
   }
-  const expenses = await Expense.find(query)
-    .populate('employeeId', 'name email internalRole')
-    .sort({ date: -1 })
-  return NextResponse.json({ success: true, data: expenses })
+
+  const { data, error } = await query
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data || []) })
 }
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.write')) return forbiddenResponse()
-  await connectDB()
-  const data = await req.json()
-  if (!data.amount || !data.category) {
-    return NextResponse.json({ success: false, message: 'Amount and category are required' }, { status: 400 })
+
+  const body = await req.json()
+  if (!body.amount || !body.category) {
+    return Response.json({ success: false, message: 'Amount and category are required' }, { status: 400 })
   }
-  const expense = await Expense.create(data)
-  return NextResponse.json({ success: true, data: expense }, { status: 201 })
+
+  const { data, error } = await supabase.from('expenses').insert({
+    description: body.description,
+    category: body.category,
+    amount: body.amount,
+    date: body.date || new Date().toISOString(),
+    employee_id: body.employeeId || body.employee_id || null,
+    is_recurring_salary: body.isRecurringSalary || body.is_recurring_salary || false,
+    salary_next_due_date: body.salaryNextDueDate || body.salary_next_due_date || null,
+  }).select().single()
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data) }, { status: 201 })
 }

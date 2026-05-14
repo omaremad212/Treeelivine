@@ -1,13 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
+import { NextRequest } from 'next/server'
 
 export async function GET(req: NextRequest) {
-  try {
-    const user = await getAuthUser(req)
-    if (!user) return NextResponse.json({ success: false, message: 'No session' }, { status: 401 })
-    const { password: _, ...safeUser } = user as any
-    return NextResponse.json({ success: true, user: safeUser })
-  } catch {
-    return NextResponse.json({ success: false, message: 'Invalid session' }, { status: 401 })
-  }
+  const user = await getAuthUser(req)
+  if (!user) return Response.json({ success: false })
+  return Response.json({ success: true, user })
 }

@@ -1,32 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Template from '@/models/Template'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'templates.read')) return forbiddenResponse()
-  await connectDB()
+
   const { searchParams } = new URL(req.url)
-  const query: any = {}
   const search = searchParams.get('search')
   const category = searchParams.get('category')
   const type = searchParams.get('type')
-  if (search) query.$or = [{ name: new RegExp(search, 'i') }, { description: new RegExp(search, 'i') }]
-  if (category) query.category = category
-  if (type) query.type = type
-  const templates = await Template.find(query).sort({ usageCount: -1, name: 1 })
-  return NextResponse.json({ success: true, data: templates })
+
+  let query = supabase.from('templates').select('*').order('usage_count', { ascending: false })
+  if (category) query = query.eq('category', category)
+  if (type) query = query.eq('type', type)
+
+  const { data, error } = await query
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+
+  let result = data || []
+  if (search) {
+    const s = search.toLowerCase()
+    result = result.filter(t => t.name?.toLowerCase().includes(s) || t.description?.toLowerCase().includes(s))
+  }
+
+  return Response.json({ success: true, data: toApi(result) })
 }
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'templates.write')) return forbiddenResponse()
-  await connectDB()
-  const data = await req.json()
-  if (!data.name) return NextResponse.json({ success: false, message: 'Name is required' }, { status: 400 })
-  const template = await Template.create({ ...data, createdBy: (user as any)._id })
-  return NextResponse.json({ success: true, data: template }, { status: 201 })
+
+  const body = await req.json()
+  if (!body.name) return Response.json({ success: false, message: 'Name is required' }, { status: 400 })
+
+  const { data, error } = await supabase.from('templates').insert({
+    name: body.name,
+    description: body.description,
+    type: body.type || 'brief',
+    category: body.category || 'general',
+    content: body.content,
+    created_by: user.id,
+  }).select().single()
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data) }, { status: 201 })
 }

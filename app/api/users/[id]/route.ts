@@ -1,42 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import User from '@/models/User'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 import bcrypt from 'bcryptjs'
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  if (!hasPermission(user, 'settings.read') && (user as any)._id.toString() !== params.id) return forbiddenResponse()
-  await connectDB()
-  const found = await User.findById(params.id).select('-password')
-  if (!found) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  return NextResponse.json({ success: true, data: found })
+  if (!hasPermission(user, 'settings.read') && user.id !== params.id) return forbiddenResponse()
+
+  const { data } = await supabase.from('users')
+    .select('id, email, name, role, is_active, is_demo, effective_permissions, created_at, updated_at')
+    .eq('id', params.id).single()
+  if (!data) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+  return Response.json({ success: true, data: toApi(data) })
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  const isSelf = (user as any)._id.toString() === params.id
+  const isSelf = user.id === params.id
   if (!isSelf && !hasPermission(user, 'settings.write')) return forbiddenResponse()
-  await connectDB()
-  const { password, role, effectivePermissions, ...data } = await req.json()
-  const update: any = { ...data }
-  if (password) update.password = await bcrypt.hash(password, 10)
+
+  const { password, role, effectivePermissions, name, email, isActive } = await req.json()
+  const updates: any = {}
+  if (name !== undefined) updates.name = name
+  if (email !== undefined) updates.email = email.toLowerCase()
+  if (isActive !== undefined) updates.is_active = isActive
+  if (password) updates.password = await bcrypt.hash(password, 10)
   if (hasPermission(user, 'settings.write')) {
-    if (role) update.role = role
-    if (effectivePermissions) update.effectivePermissions = effectivePermissions
+    if (role) updates.role = role
+    if (effectivePermissions) updates.effective_permissions = effectivePermissions
   }
-  const found = await User.findByIdAndUpdate(params.id, update, { new: true }).select('-password')
-  if (!found) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  return NextResponse.json({ success: true, data: found })
+
+  const { data, error } = await supabase.from('users')
+    .update(updates).eq('id', params.id)
+    .select('id, email, name, role, is_active, is_demo, effective_permissions, created_at, updated_at')
+    .single()
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  if (!data) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+  return Response.json({ success: true, data: toApi(data) })
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'settings.write')) return forbiddenResponse()
-  await connectDB()
-  await User.findByIdAndDelete(params.id)
-  return NextResponse.json({ success: true })
+
+  const { error } = await supabase.from('users').delete().eq('id', params.id)
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true })
 }

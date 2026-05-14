@@ -1,22 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Customer from '@/models/Customer'
-import Project from '@/models/Project'
-import Invoice from '@/models/Invoice'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  if ((user as any).role !== 'client') {
-    return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 })
+  if (user.role !== 'client') {
+    return Response.json({ success: false, message: 'Forbidden' }, { status: 403 })
   }
-  await connectDB()
-  const customer = await Customer.findOne({ user: (user as any)._id })
-  if (!customer) return NextResponse.json({ success: false, message: 'No customer record found' }, { status: 404 })
-  const [projects, invoices] = await Promise.all([
-    Project.find({ customerId: customer._id }).sort({ updatedAt: -1 }),
-    Invoice.find({ customerId: customer._id }).sort({ createdAt: -1 }),
+
+  const { data: customer } = await supabase.from('customers').select('*').eq('user_id', user.id).single()
+  if (!customer) return Response.json({ success: false, message: 'No customer record found' }, { status: 404 })
+
+  const [{ data: projects }, { data: invoices }] = await Promise.all([
+    supabase.from('projects').select('*').eq('customer_id', customer.id).order('updated_at', { ascending: false }),
+    supabase.from('invoices').select('*').eq('customer_id', customer.id).order('created_at', { ascending: false }),
   ])
-  return NextResponse.json({ success: true, data: { customer, projects, invoices } })
+
+  return Response.json({ success: true, data: { customer: toApi(customer), projects: toApi(projects || []), invoices: toApi(invoices || []) } })
 }

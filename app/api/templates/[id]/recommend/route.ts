@@ -1,17 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Template from '@/models/Template'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  await connectDB()
-  const source = await Template.findById(params.id)
-  if (!source) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  const recommendations = await Template.find({
-    _id: { $ne: source._id },
-    $or: [{ category: source.category }, { type: source.type }],
-  }).limit(5).sort({ usageCount: -1 })
-  return NextResponse.json({ success: true, data: recommendations })
+
+  const { data: source } = await supabase.from('templates').select('id,category,type').eq('id', params.id).single()
+  if (!source) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+
+  const { data } = await supabase.from('templates')
+    .select('*')
+    .neq('id', source.id)
+    .or(`category.eq.${source.category},type.eq.${source.type}`)
+    .order('usage_count', { ascending: false })
+    .limit(5)
+
+  return Response.json({ success: true, data: toApi(data || []) })
 }

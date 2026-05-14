@@ -1,19 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Project from '@/models/Project'
+import { supabase } from '@/lib/supabase'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
-  await connectDB()
+
   const { text } = await req.json()
-  if (!text?.trim()) return NextResponse.json({ success: false, message: 'Comment text required' }, { status: 400 })
-  const project = await Project.findByIdAndUpdate(
-    params.id,
-    { $push: { briefComments: { authorId: (user as any)._id, authorName: (user as any).name || (user as any).email, text, createdAt: new Date() } } },
-    { new: true }
-  )
-  if (!project) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 })
-  return NextResponse.json({ success: true, data: project.briefComments })
+  if (!text?.trim()) return Response.json({ success: false, message: 'Comment text required' }, { status: 400 })
+
+  const { data: project } = await supabase.from('projects').select('brief_comments').eq('id', params.id).single()
+  if (!project) return Response.json({ success: false, message: 'Not found' }, { status: 404 })
+
+  const existingComments = Array.isArray(project.brief_comments) ? project.brief_comments : []
+  const newComment = { authorId: user.id, authorName: user.name || user.email, text, createdAt: new Date().toISOString() }
+  const updatedComments = [...existingComments, newComment]
+
+  const { error } = await supabase.from('projects').update({ brief_comments: updatedComments }).eq('id', params.id)
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: updatedComments })
 }

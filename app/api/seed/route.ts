@@ -1,95 +1,100 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { connectDB } from '@/lib/mongodb'
+import { supabase } from '@/lib/supabase'
 import { signToken, cookieOptions } from '@/lib/auth'
-import User from '@/models/User'
-import Customer from '@/models/Customer'
-import Employee from '@/models/Employee'
-import Project from '@/models/Project'
-import Task from '@/models/Task'
-import Invoice from '@/models/Invoice'
-import Expense from '@/models/Expense'
-import Setting from '@/models/Setting'
-import { demoCustomers, demoEmployees, demoProjects, DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/demo-data'
+import { cookies } from 'next/headers'
 
-export async function POST(req: NextRequest) {
+const DEMO_EMAIL = 'demo@treeelivine.com'
+const DEMO_PASSWORD = 'demo1234'
+
+export async function POST(_req: NextRequest) {
   try {
-    await connectDB()
-
-    // Clear existing demo data
-    await Promise.all([
-      User.deleteMany({ isDemo: true }),
-      Customer.deleteMany({ isDemo: true }),
-      Employee.deleteMany({ isDemo: true }),
-      Project.deleteMany({ isDemo: true }),
-      Task.deleteMany({ isDemo: true }),
-      Invoice.deleteMany({ isDemo: true }),
-      Expense.deleteMany({ isDemo: true }),
-    ])
-
-    // Ensure settings exist
-    let settings = await Setting.findOne()
-    if (!settings) settings = await Setting.create({})
+    // Clean up existing demo data
+    for (const table of ['tasks','invoices','expenses','projects','templates','employees','customers','users']) {
+      await supabase.from(table).delete().eq('is_demo', true)
+    }
 
     // Create demo admin user
-    const hashed = await bcrypt.hash(DEMO_PASSWORD, 10)
-    const demoUser = await User.create({ email: DEMO_EMAIL, password: hashed, role: 'admin', isActive: true, isDemo: true })
-
-    // Create demo customers
-    const customers = await Customer.insertMany(demoCustomers.map(c => ({ ...c, isDemo: true })))
+    const hash = await bcrypt.hash(DEMO_PASSWORD, 10)
+    const { data: demoUser } = await supabase.from('users').insert({
+      email: DEMO_EMAIL, password: hash, name: 'Demo Admin', role: 'admin',
+      is_active: true, is_demo: true
+    }).select().single()
+    if (!demoUser) throw new Error('Failed to create demo user')
 
     // Create demo employees
-    const employees = await Employee.insertMany(demoEmployees.map(e => ({ ...e, isDemo: true })))
+    const empInserts = [
+      { name: 'أحمد المالكي', email: 'ahmed@treeelivine.com', phone: '0501111111', internal_role: 'account_manager', salary: 8000, is_demo: true },
+      { name: 'سارة الشهري', email: 'sara@treeelivine.com', phone: '0502222222', internal_role: 'designer', salary: 6000, is_demo: true },
+      { name: 'محمد العتيبي', email: 'mohammed@treeelivine.com', phone: '0503333333', internal_role: 'content_writer', salary: 5000, is_demo: true },
+      { name: 'نورة القحطاني', email: 'noura@treeelivine.com', phone: '0504444444', internal_role: 'project_manager', salary: 9000, is_demo: true },
+    ]
+    const { data: employees } = await supabase.from('employees').insert(empInserts).select()
+
+    // Create demo customers
+    const custInserts = [
+      { name: 'شركة النجوم للتقنية', company: 'النجوم للتقنية', email: 'info@stars-tech.sa', phone: '0501234567', status: 'active', priority: 'high', is_demo: true },
+      { name: 'مؤسسة الريادة', company: 'الريادة', email: 'contact@riyadah.sa', phone: '0509876543', status: 'prospect', priority: 'medium', is_demo: true },
+      { name: 'شركة المستقبل الرقمي', company: 'المستقبل الرقمي', email: 'hello@future-digital.sa', phone: '0551234567', status: 'active', priority: 'high', is_demo: true },
+      { name: 'مجموعة الإبداع', company: 'الإبداع', email: 'info@ibdaa.sa', phone: '0561234567', status: 'negotiation', priority: 'urgent', is_demo: true },
+    ]
+    const { data: customers } = await supabase.from('customers').insert(custInserts).select()
 
     // Create demo projects
-    const projects = await Project.insertMany(demoProjects.map((p, i) => ({
-      ...p,
-      customerId: customers[i % customers.length]._id,
-      accountManagerId: employees[0]._id,
-      assignedEmployeeIds: [employees[1]._id, employees[2]._id],
-      assignmentStatus: 'ready',
-      isDemo: true,
-    })))
+    if (customers?.length && employees?.length) {
+      const projInserts = [
+        { name: 'حملة التواصل الاجتماعي', customer_id: customers[0].id, status: 'active', assigned_employee_ids: [employees[0].id, employees[1].id], is_demo: true },
+        { name: 'هوية الريادة البصرية', customer_id: customers[1].id, status: 'active', assigned_employee_ids: [employees[1].id], is_demo: true },
+        { name: 'استراتيجية المستقبل 2025', customer_id: customers[2].id, status: 'planning', assigned_employee_ids: [employees[3].id], is_demo: true },
+      ]
+      const { data: projects } = await supabase.from('projects').insert(projInserts).select()
 
-    // Create demo tasks
-    const taskData = [
-      { title: 'تصميم بوست إنستغرام - أسبوع 1', status: 'in_progress', priority: 'high', projectId: projects[0]._id, customerId: customers[0]._id, currentAssigneeId: employees[1]._id, dueDate: new Date(Date.now() + 2 * 86400000), isDemo: true },
-      { title: 'كتابة محتوى شهر أبريل', status: 'new', priority: 'medium', projectId: projects[0]._id, customerId: customers[0]._id, currentAssigneeId: employees[2]._id, dueDate: new Date(Date.now() + 5 * 86400000), isDemo: true },
-      { title: 'تصميم الشعار الأساسي', status: 'under_review', priority: 'urgent', projectId: projects[1]._id, customerId: customers[1]._id, currentAssigneeId: employees[1]._id, reviewRequired: true, reviewStatus: 'under_review', dueDate: new Date(Date.now() - 1 * 86400000), isDemo: true },
-      { title: 'استراتيجية المحتوى Q2', status: 'completed', priority: 'high', projectId: projects[2]._id, customerId: customers[2]._id, currentAssigneeId: employees[3]._id, completedAt: new Date(), efficiencyScore: 85, isDemo: true },
-      { title: 'إدارة إعلانات Meta', status: 'in_progress', priority: 'high', projectId: projects[2]._id, customerId: customers[2]._id, currentAssigneeId: employees[0]._id, dueDate: new Date(Date.now() + 3 * 86400000), isDemo: true },
-      { title: 'تصوير منتجات رمضان', status: 'on_hold', priority: 'medium', projectId: projects[3]._id, customerId: customers[3]._id, currentAssigneeId: employees[1]._id, isDemo: true },
-    ]
-    await Task.insertMany(taskData)
+      // Create demo tasks
+      if (projects?.length) {
+        await supabase.from('tasks').insert([
+          { title: 'تصميم بوست إنستغرام', project_id: projects[0].id, current_assignee_id: employees[1].id, status: 'in_progress', priority: 'high', is_demo: true },
+          { title: 'كتابة كابشن الأسبوع', project_id: projects[0].id, current_assignee_id: employees[2].id, status: 'pending', priority: 'medium', is_demo: true },
+          { title: 'تصميم الشعار', project_id: projects[1].id, current_assignee_id: employees[1].id, status: 'in_review', priority: 'high', is_demo: true },
+          { title: 'اجتماع استراتيجي', project_id: projects[2].id, current_assignee_id: employees[3].id, status: 'pending', priority: 'medium', is_demo: true },
+        ])
+      }
 
-    // Create demo invoices
-    const invoiceData = [
-      { invoiceNumber: 'INV-0001', customerId: customers[0]._id, projectId: projects[0]._id, subtotalOriginal: 15000, subtotalBase: 15000, currency: 'SAR', exchangeRateToBase: 1, taxRate: 15, taxAmountOriginal: 2250, taxAmountBase: 2250, amountBase: 17250, paidAmountBase: 17250, remainingAmountBase: 0, status: 'paid', issueDate: new Date('2025-01-01'), dueDate: new Date('2025-01-15'), isDemo: true },
-      { invoiceNumber: 'INV-0002', customerId: customers[2]._id, projectId: projects[2]._id, subtotalOriginal: 22000, subtotalBase: 22000, currency: 'SAR', exchangeRateToBase: 1, taxRate: 15, taxAmountOriginal: 3300, taxAmountBase: 3300, amountBase: 25300, paidAmountBase: 0, remainingAmountBase: 25300, status: 'issued', issueDate: new Date('2025-03-01'), dueDate: new Date('2025-03-15'), isDemo: true },
-      { invoiceNumber: 'INV-0003', customerId: customers[1]._id, projectId: projects[1]._id, subtotalOriginal: 8000, subtotalBase: 8000, currency: 'SAR', exchangeRateToBase: 1, taxRate: 15, taxAmountOriginal: 1200, taxAmountBase: 1200, amountBase: 9200, paidAmountBase: 4600, remainingAmountBase: 4600, status: 'partially_paid', issueDate: new Date('2025-02-01'), dueDate: new Date('2025-02-20'), isDemo: true },
-    ]
-    await Invoice.insertMany(invoiceData)
+      // Create demo invoices
+      await supabase.from('invoices').insert([
+        { invoice_number: 'INV-2024-001', customer_id: customers[0].id, project_id: projects?.[0]?.id, status: 'paid', amount: 15000, paid_amount: 15000, remaining_amount: 0, subtotal: 13043, tax_rate: 15, tax_amount: 1957, currency: 'SAR', is_demo: true },
+        { invoice_number: 'INV-2024-002', customer_id: customers[2].id, project_id: projects?.[2]?.id, status: 'unpaid', amount: 22000, paid_amount: 0, remaining_amount: 22000, subtotal: 19130, tax_rate: 15, tax_amount: 2870, currency: 'SAR', is_demo: true },
+        { invoice_number: 'INV-2024-003', customer_id: customers[1].id, project_id: projects?.[1]?.id, status: 'partial', amount: 8000, paid_amount: 4000, remaining_amount: 4000, subtotal: 6957, tax_rate: 15, tax_amount: 1043, currency: 'SAR', is_demo: true },
+      ])
+    }
 
     // Create demo expenses
-    await Expense.insertMany([
-      { description: 'إيجار المكتب - مارس', category: 'إيجار', amount: 8000, amountOriginal: 8000, amountBase: 8000, currency: 'SAR', expenseType: 'single', isDemo: true },
-      { description: 'اشتراكات أدوات', category: 'تقنية', amount: 2000, amountOriginal: 2000, amountBase: 2000, currency: 'SAR', expenseType: 'single', isDemo: true },
-      { description: 'راتب سارة الشهري', category: 'رواتب', amount: 12000, amountOriginal: 12000, amountBase: 12000, currency: 'SAR', expenseType: 'salary', employeeId: employees[1]._id, isTemplate: true, active: true, salaryStartDate: new Date('2025-01-01'), salaryNextDueDate: new Date('2025-04-01'), isDemo: true },
+    if (employees?.length) {
+      await supabase.from('expenses').insert([
+        { description: 'راتب أحمد المالكي', category: 'salary', amount: 8000, employee_id: employees[0].id, is_recurring_salary: true, salary_next_due_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(), is_demo: true },
+        { description: 'راتب سارة الشهري', category: 'salary', amount: 6000, employee_id: employees[1].id, is_recurring_salary: true, salary_next_due_date: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(), is_demo: true },
+        { description: 'فاتورة الإنترنت', category: 'utilities', amount: 500, is_demo: true },
+        { description: 'اشتراك Adobe Creative Cloud', category: 'software', amount: 350, is_demo: true },
+      ])
+    }
+
+    // Create demo templates
+    await supabase.from('templates').insert([
+      { name: 'بريف إدارة السوشيال ميديا', type: 'brief', category: 'social_media', content: 'اسم العميل:\nالمنصات المطلوبة:\nعدد المنشورات أسبوعياً:\nالهوية البصرية:', created_by: demoUser.id, is_demo: true },
+      { name: 'بريف تصميم الهوية', type: 'brief', category: 'branding', content: 'اسم الشركة:\nقطاع النشاط:\nالألوان المفضلة:\nالرسالة الأساسية:', created_by: demoUser.id, is_demo: true },
     ])
 
-    // Generate token for demo login
-    const token = signToken(demoUser._id.toString())
-    const allPerms = (settings.roles || []).find((r: any) => r.role === 'admin')?.permissions || []
+    // Auto-login demo user
+    const token = signToken(demoUser.id)
+    const cookieStore = cookies()
+    cookieStore.set('treeelivine_session', token, cookieOptions())
 
-    const res = NextResponse.json({
+    return Response.json({
       success: true,
-      message: 'Demo data seeded successfully',
-      user: { _id: demoUser._id, email: DEMO_EMAIL, role: 'admin', isActive: true, effectivePermissions: allPerms, isDemo: true },
+      message: 'Demo data created',
+      user: { _id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role }
     })
-    res.cookies.set('treeelivine_session', token, cookieOptions())
-    return res
-  } catch (err: any) {
-    console.error('Seed error:', err)
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 })
+  } catch (e) {
+    console.error('Seed error:', e)
+    return Response.json({ success: false, message: 'Seed failed' }, { status: 500 })
   }
 }

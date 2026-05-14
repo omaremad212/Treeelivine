@@ -1,35 +1,46 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import Expense from '@/models/Expense'
+import { supabase } from '@/lib/supabase'
+import { toApi } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.read')) return forbiddenResponse()
-  await connectDB()
-  const templates = await Expense.find({ isRecurringSalary: true })
-    .populate('employeeId', 'name email internalRole')
-    .sort({ createdAt: -1 })
-  return NextResponse.json({ success: true, data: templates })
+
+  const { data, error } = await supabase.from('expenses')
+    .select('*, employee:employees(id,name,email,internal_role)')
+    .eq('is_recurring_salary', true)
+    .order('created_at', { ascending: false })
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data || []) })
 }
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'finance.write')) return forbiddenResponse()
-  await connectDB()
-  const data = await req.json()
-  if (!data.employeeId || !data.amount) {
-    return NextResponse.json({ success: false, message: 'Employee and amount required' }, { status: 400 })
+
+  const body = await req.json()
+  const employeeId = body.employeeId || body.employee_id
+  if (!employeeId || !body.amount) {
+    return Response.json({ success: false, message: 'Employee and amount required' }, { status: 400 })
   }
+
   const now = new Date()
-  const template = await Expense.create({
-    ...data,
+  const nextDue = body.salaryNextDueDate || body.salary_next_due_date || new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString()
+
+  const { data, error } = await supabase.from('expenses').insert({
+    description: body.description,
     category: 'salary',
-    isRecurringSalary: true,
-    salaryNextDueDate: data.salaryNextDueDate || new Date(now.getFullYear(), now.getMonth() + 1, 1),
-    date: now,
-  })
-  return NextResponse.json({ success: true, data: template }, { status: 201 })
+    amount: body.amount,
+    employee_id: employeeId,
+    is_recurring_salary: true,
+    salary_next_due_date: nextDue,
+    date: now.toISOString(),
+  }).select().single()
+
+  if (error) return Response.json({ success: false, message: error.message }, { status: 500 })
+  return Response.json({ success: true, data: toApi(data) }, { status: 201 })
 }

@@ -1,26 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { connectDB } from '@/lib/mongodb'
-import User from '@/models/User'
-import Customer from '@/models/Customer'
+import { supabase } from '@/lib/supabase'
+import { signToken, cookieOptions } from '@/lib/auth'
+import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, phone, email, password } = await req.json()
-    if (!name || !email || !password) return NextResponse.json({ success: false, message: 'Name, email and password required' }, { status: 400 })
+    const { email, password, name, role } = await req.json()
+    if (!email || !password) return Response.json({ success: false, message: 'Missing fields' }, { status: 400 })
 
-    await connectDB()
-    const exists = await User.findOne({ email: email.toLowerCase() })
-    if (exists) return NextResponse.json({ success: false, message: 'Email already registered' }, { status: 409 })
+    const { data: existing } = await supabase.from('users').select('id').eq('email', email.toLowerCase()).single()
+    if (existing) return Response.json({ success: false, message: 'Email already exists' }, { status: 409 })
 
-    const hashed = await bcrypt.hash(password, 10)
-    const customer = await Customer.create({ name, phone, email, status: 'active' })
-    const user = await User.create({ email: email.toLowerCase(), password: hashed, role: 'client', isActive: true, referenceId: customer._id, roleRef: 'Customer' })
-    customer.user = user._id
-    await customer.save()
+    const hash = await bcrypt.hash(password, 10)
+    const { data: user, error } = await supabase.from('users').insert({
+      email: email.toLowerCase(), password: hash, name, role: role || 'client'
+    }).select().single()
 
-    return NextResponse.json({ success: true, message: 'Registered successfully' }, { status: 201 })
-  } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 })
+    if (error || !user) return Response.json({ success: false, message: 'Failed to create user' }, { status: 500 })
+
+    const token = signToken(user.id)
+    const cookieStore = cookies()
+    cookieStore.set('treeelivine_session', token, cookieOptions())
+
+    return Response.json({
+      success: true,
+      user: { _id: user.id, id: user.id, email: user.email, name: user.name, role: user.role, effectivePermissions: [] }
+    })
+  } catch (e) {
+    console.error(e)
+    return Response.json({ success: false, message: 'Server error' }, { status: 500 })
   }
 }

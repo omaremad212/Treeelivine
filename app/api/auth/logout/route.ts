@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function POST() {
-  const res = NextResponse.json({ success: true })
-  res.cookies.set('treeelivine_session', '', { maxAge: 0, path: '/' })
-  return res
+  const cookieStore = cookies()
+  cookieStore.delete('treeelivine_session')
+  return Response.json({ success: true })
 }
