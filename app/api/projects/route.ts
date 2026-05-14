@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     .select('*, customer:customers(id,name,email,company)')
     .order('updated_at', { ascending: false })
 
-  if (!user.isDemo) query = query.eq('is_demo', false)
+  query = query.eq('is_demo', !!user.isDemo)
   if (status) query = query.eq('status', status)
 
   if (user.role === 'team') {

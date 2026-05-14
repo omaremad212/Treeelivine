@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
   await syncRecurringSalaryExpenses()
 
-  const d = !user.isDemo
+  const isDemo = !!user.isDemo
   const [
     { data: customers },
     { data: projects },
@@ -17,11 +17,11 @@ export async function GET(req: NextRequest) {
     { data: invoices },
     { data: expenses },
   ] = await Promise.all([
-    (d ? supabase.from('customers').select('id, status').eq('is_demo', false) : supabase.from('customers').select('id, status')),
-    (d ? supabase.from('projects').select('id, status').eq('is_demo', false)  : supabase.from('projects').select('id, status')),
-    (d ? supabase.from('tasks').select('id, status, due_date').eq('is_demo', false) : supabase.from('tasks').select('id, status, due_date')),
-    (d ? supabase.from('invoices').select('id, status, amount, paid_amount, remaining_amount').eq('is_demo', false) : supabase.from('invoices').select('id, status, amount, paid_amount, remaining_amount')),
-    (d ? supabase.from('expenses').select('id, amount').eq('is_recurring_salary', false).eq('is_demo', false) : supabase.from('expenses').select('id, amount').eq('is_recurring_salary', false)),
+    supabase.from('customers').select('id, status').eq('is_demo', isDemo),
+    supabase.from('projects').select('id, status').eq('is_demo', isDemo),
+    supabase.from('tasks').select('id, status, due_date').eq('is_demo', isDemo),
+    supabase.from('invoices').select('id, status, amount, paid_amount, remaining_amount').eq('is_demo', isDemo),
+    supabase.from('expenses').select('id, amount').eq('is_recurring_salary', false).eq('is_demo', isDemo),
   ])
 
   const now = new Date()

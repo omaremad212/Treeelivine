@@ -70,7 +70,7 @@ export default function LoginPage() {
     setError('')
     const ok = await login(email, password)
     if (ok) {
-      router.push('/app')
+      window.location.href = '/app'
     } else {
       setError(isAr ? 'بيانات الدخول غير صحيحة' : 'Invalid credentials')
       setLoading(false)
@@ -84,7 +84,7 @@ export default function LoginPage() {
       const res = await fetch('/api/seed', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
-        router.push('/app')
+        window.location.href = '/app'
       } else {
         setError(isAr ? 'تعذّر تشغيل الديمو' : 'Demo setup failed')
         setDemoLoading(false)

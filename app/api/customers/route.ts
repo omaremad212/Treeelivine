@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     .select('*, assigned_employee:employees(id,name)')
     .order('updated_at', { ascending: false })
 
-  if (!user.isDemo) query = query.eq('is_demo', false)
+  query = query.eq('is_demo', !!user.isDemo)
 
   if (archived) {
     query = query.not('archived_at', 'is', null)

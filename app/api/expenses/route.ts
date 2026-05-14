@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     .select('*, employee:employees(id,name,email,internal_role)')
     .order('date', { ascending: false })
 
-  if (!user.isDemo) query = query.eq('is_demo', false)
+  query = query.eq('is_demo', !!user.isDemo)
   if (category) query = query.eq('category', category)
   if (employeeId) query = query.eq('employee_id', employeeId)
   if (month) {
