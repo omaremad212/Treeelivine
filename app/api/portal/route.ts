@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data: customer } = await supabase.from('customers').select('*').eq('user_id', user.id).single()
-  if (!customer) return Response.json({ success: false, message: 'No customer record found' }, { status: 404 })
+  if (!customer) return Response.json({ success: true, data: { customer: { name: user.name || user.email }, projects: [], invoices: [] } })
 
   const [{ data: projects }, { data: invoices }] = await Promise.all([
     supabase.from('projects').select('*').eq('customer_id', customer.id).order('updated_at', { ascending: false }),
