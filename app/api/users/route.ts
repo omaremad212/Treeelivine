@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     email: email.toLowerCase(),
     password: hash,
     name,
-    role: role || 'staff',
+    role: role || 'team',
     is_active: true,
   }).select('id, email, name, role, is_active, is_demo, effective_permissions, created_at, updated_at').single()
 

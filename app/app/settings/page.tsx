@@ -8,7 +8,9 @@ type Tab = 'general' | 'permissions' | 'users' | 'currencies'
 const ROLES = [
   { value: 'admin',   label: 'Admin',   color: '#e53e3e', bg: '#fff5f5' },
   { value: 'manager', label: 'Manager', color: '#805ad5', bg: '#faf5ff' },
-  { value: 'staff',   label: 'Staff',   color: '#3182ce', bg: '#ebf8ff' },
+  { value: 'team',    label: 'Team',    color: '#3182ce', bg: '#ebf8ff' },
+  { value: 'finance', label: 'Finance', color: '#d69e2e', bg: '#fffff0' },
+  { value: 'viewer',  label: 'Viewer',  color: '#718096', bg: '#f7fafc' },
   { value: 'client',  label: 'Client',  color: '#38a169', bg: '#f0fff4' },
 ]
 
@@ -25,7 +27,7 @@ function RoleBadge({ role }: { role: string }) {
   )
 }
 
-const BLANK_FORM = { name: '', email: '', password: '', role: 'staff' }
+const BLANK_FORM = { name: '', email: '', password: '', role: 'team' }
 
 function UserModal({ user, onClose, onSave }: {
   user: any | null  // null = create, object = edit
@@ -88,8 +90,10 @@ function UserModal({ user, onClose, onSave }: {
             </select>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6 }}>
               {form.role === 'admin' && 'Full access to everything'}
-              {form.role === 'manager' && 'Access based on assigned permissions'}
-              {form.role === 'staff' && 'Limited access based on assigned permissions'}
+              {form.role === 'manager' && 'Broad access: CRM, projects, tasks, team'}
+              {form.role === 'team' && 'Access to projects and tasks'}
+              {form.role === 'finance' && 'Access to finance, projects, and tasks'}
+              {form.role === 'viewer' && 'Read-only access to CRM, projects, tasks'}
               {form.role === 'client' && 'Client portal access only'}
             </p>
           </div>
