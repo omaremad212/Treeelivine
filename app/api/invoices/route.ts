@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     .select('*, customer:customers(id,name,email,company), project:projects(id,name)')
     .order('created_at', { ascending: false })
 
+  if (!user.isDemo) query = query.eq('is_demo', false)
   if (status) query = query.eq('status', status)
   if (customerId) query = query.eq('customer_id', customerId)
   if (projectId) query = query.eq('project_id', projectId)

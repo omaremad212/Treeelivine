@@ -211,10 +211,10 @@ export default function DashboardPage() {
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)', marginBottom: '0.875rem' }}>Quick Actions</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <QuickAction href="/app/invoices/new" icon={<Icons.PlusCircle />} label="New Invoice" color="#4f6831" />
-                <QuickAction href="/app/customers/new" icon={<Icons.UserPlus />} label="Add Customer" color="#7c3aed" />
-                <QuickAction href="/app/projects/new" icon={<Icons.FolderPlus />} label="New Project" color="#d97706" />
-                <QuickAction href="/app/expenses/new" icon={<Icons.Receipt />} label="Log Expense" color="#ef4444" />
+                <QuickAction href="/app/invoices"   icon={<Icons.PlusCircle />} label="New Invoice"    color="#4f6831" />
+                <QuickAction href="/app/clients"    icon={<Icons.UserPlus />}   label="Add Customer"  color="#7c3aed" />
+                <QuickAction href="/app/projects"   icon={<Icons.FolderPlus />} label="New Project"   color="#d97706" />
+                <QuickAction href="/app/financial"  icon={<Icons.Receipt />}    label="Log Expense"   color="#ef4444" />
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   const internalRole = searchParams.get('internalRole')
 
   let query = supabase.from('employees').select('*').order('name')
+  if (!user.isDemo) query = query.eq('is_demo', false)
   if (internalRole) query = query.eq('internal_role', internalRole)
 
   const { data, error } = await query
