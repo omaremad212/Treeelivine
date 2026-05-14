@@ -93,7 +93,7 @@ function ModuleBadge({ iconKey, name, desc }: { iconKey: string; name: string; d
 /* ── Testimonial ──────────────────────────────────────────────────────── */
 function TestimonialCard({ quote, name, role, initials }: { quote: string; name: string; role: string; initials: string }) {
   return (
-    <div className="fade-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24 }}>
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24 }}>
       <div style={{ fontSize: 32, color: 'var(--brand-primary)', lineHeight: 1, marginBottom: 16, opacity: 0.4 }}>"</div>
       <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>{quote}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -200,64 +200,130 @@ export default function LandingPage() {
       if (data.success) {
         router.push('/app')
       } else {
-        alert('تعذّر تشغيل الديمو. تأكد من اتصال قاعدة البيانات.')
+        alert(lp.demoFailMsg)
         setDemoLoading(false)
       }
     } catch {
-      alert('تعذّر تشغيل الديمو.')
+      alert(lp.demoFailMsg)
       setDemoLoading(false)
     }
   }
 
-  const features = [
-    { iconKey: 'crm',       title: 'إدارة العملاء CRM',     desc: 'تتبّع كل عميل من أول تواصل حتى إغلاق الصفقة، مع إدارة كاملة للحالة والأولوية والمسؤول.' },
-    { iconKey: 'projects',  title: 'إدارة المشاريع',         desc: 'أسند المشاريع، تابع التقدم، وشارك البريف مع العملاء مباشرةً من منصة واحدة.' },
-    { iconKey: 'tasks',     title: 'المهام والتسليمات',      desc: 'نظام مهام مرن يربط الفريق بالمشاريع والعملاء، مع تتبع التقدم والمواعيد النهائية.' },
-    { iconKey: 'finance',   title: 'الفواتير والمالية',      desc: 'أنشئ فواتير احترافية، تتبّع المدفوعات، وراقب المصروفات والأرباح في لوحة مالية موحدة.' },
-    { iconKey: 'analytics', title: 'تقارير وتحليلات',        desc: 'لوحة مؤشرات حية توضح الإيرادات والأرباح والأداء — بأرقام حقيقية وفي الوقت الفعلي.' },
-    { iconKey: 'roles',     title: 'صلاحيات وأدوار',         desc: 'تحكّم في وصول كل مستخدم بدقة — أدمن، مدير، فريق، عميل — مع صلاحيات تفصيلية لكل وحدة.' },
-  ]
-
-  const modules = [
-    { iconKey: 'dashboard', name: 'Dashboard',     desc: 'لوحة التحكم' },
-    { iconKey: 'crm',       name: 'CRM',           desc: 'إدارة العملاء' },
-    { iconKey: 'projects',  name: 'Projects',      desc: 'المشاريع والبريف' },
-    { iconKey: 'tasks',     name: 'Tasks',         desc: 'المهام والتسليم' },
-    { iconKey: 'team',      name: 'Team',          desc: 'الفريق والرواتب' },
-    { iconKey: 'finance',   name: 'Finance',       desc: 'الفواتير والمالية' },
-    { iconKey: 'templates', name: 'Templates',     desc: 'قوالب جاهزة' },
-    { iconKey: 'settings',  name: 'Settings',      desc: 'الإعدادات' },
-    { iconKey: 'portal',    name: 'Client Portal', desc: 'بوابة العميل' },
-  ]
-
-  const stats = [
-    { value: '500+',    label: 'عميل تمت إدارته' },
-    { value: '12,000+', label: 'مهمة تم تتبعها' },
-    { value: '99%',     label: 'نسبة التشغيل' },
-    { value: '24/7',    label: 'وصول بلا انقطاع' },
-  ]
-
-  const testimonials = [
-    { quote: 'Treeelivine غيّر طريقة إدارتنا للفريق. الآن كل شيء في مكان واحد ولا يفوتنا شيء.', name: 'أحمد الزهراني', role: 'مدير وكالة تسويق', initials: 'أز' },
-    { quote: 'بوابة العميل رائعة! يقدر عملاؤنا يتابعون مشاريعهم ويوافقون على البريف مباشرةً.', name: 'سارة العمري', role: 'CEO — إبداع الرقمي', initials: 'سع' },
-    { quote: 'الفواتير والمصروفات أصبحت سهلة جداً. وفّرنا ساعات من العمل اليدوي كل أسبوع.', name: 'فهد المطيري', role: 'مدير مالي', initials: 'فم' },
-    { quote: 'إدارة المشاريع والمهام صارت أوضح بكثير. كل فرد في الفريق يعرف مهامه بالضبط.', name: 'نورة الشمري', role: 'مديرة مشاريع', initials: 'نش' },
-    { quote: 'النظام سهّل علينا متابعة العملاء من أول تواصل لحين إغلاق الصفقة. ممتاز جداً.', name: 'خالد العتيبي', role: 'مدير مبيعات', initials: 'خع' },
-    { quote: 'التقارير المالية الآن تُنجز في دقائق بدلاً من ساعات. ربحنا وقتاً ثميناً جداً.', name: 'ريم الحارثي', role: 'CFO — نور ميديا', initials: 'رح' },
-    { quote: 'صلاحيات الأدوار دقيقة جداً. كل موظف يرى فقط ما يخصه وهذا يحسّن الإنتاجية.', name: 'طارق السبيعي', role: 'CTO — سحاب تك', initials: 'طس' },
-    { quote: 'بريف المشاريع ووثائق العميل كلها في مكان واحد. لا مزيد من البريد والواتساب.', name: 'منى القحطاني', role: 'مديرة محتوى', initials: 'مق' },
-    { quote: 'الديمو كان كافياً لأقرر الاشتراك فوراً. النظام واضح وسريع ومُصمَّم للعرب.', name: 'عمر الدوسري', role: 'صاحب وكالة إبداعية', initials: 'عد' },
-  ]
-
-  const faqs = [
-    { q: 'هل يمكن تجربة النظام قبل إنشاء حساب؟', a: 'نعم! اضغط على "جرّب الديمو" وسيتم إنشاء بيانات تجريبية كاملة وتسجيل دخولك تلقائياً بدون أي خطوات إضافية.' },
-    { q: 'هل يعمل النظام على الموبايل؟', a: 'نعم، النظام مصمم بشكل متجاوب يعمل على جميع الأجهزة — سطح المكتب والتابلت والموبايل.' },
-    { q: 'ما الوحدات المتوفرة في النظام؟', a: 'يضم النظام 9 وحدات: لوحة تحكم، CRM، مشاريع، مهام، فريق، مالية، قوالب، إعدادات، وبوابة عميل.' },
-    { q: 'هل يوجد بوابة للعميل؟', a: 'نعم! يمكن لعملائك الوصول لبوابة خاصة لمتابعة المشاريع، والموافقة على البريف، وعرض الفواتير.' },
-    { q: 'هل النظام مصمم للعربية؟', a: 'نعم، النظام عربي-أول مع دعم كامل للغة الإنجليزية، مع تصميم RTL أصيل وليس مجرد ترجمة.' },
-  ]
-
   const isDark = theme === 'dark'
+  const isAr = lang === 'ar'
+
+  /* ── All landing-page text in both languages ── */
+  const lp = {
+    dir: isAr ? 'rtl' : 'ltr',
+    // Nav
+    navFeatures:  isAr ? 'المميزات'   : 'Features',
+    navModules:   isAr ? 'الوحدات'    : 'Modules',
+    navPricing:   isAr ? 'الأسعار'    : 'Pricing',
+    navLogin:     isAr ? 'دخول'       : 'Sign In',
+    navRegister:  isAr ? 'حساب جديد'  : 'New Account',
+    navDemo:      isAr ? 'جرّب الديمو' : 'Try Demo',
+    // Hero
+    trustBadge:   isAr ? 'موثوق من مئات الوكالات' : 'Trusted by hundreds of agencies',
+    heroLine1:    isAr ? ['شغّل','شركتك','بالكامل'] : ['Run','Your','Business'],
+    heroLine2:    isAr ? ['من','منصة','ERP','واحدة'] : ['From','One','ERP','Platform'],
+    heroSub:      isAr
+      ? 'إدارة العملاء، المشاريع، المهام، الفواتير، والمالية — كل شيء في لوحة تحكم واحدة مصممة لوكالات التسويق.'
+      : 'Manage clients, projects, tasks, invoices, and finances — everything in one dashboard built for marketing agencies.',
+    heroCta1:     isAr ? 'جرّب الديمو مجاناً' : 'Try Demo for Free',
+    heroCta2:     isAr ? 'إنشاء حساب'         : 'Create Account',
+    heroNote:     isAr ? 'بدون بطاقة ائتمانية · بدون تسجيل' : 'No credit card · No registration required',
+    heroLoading:  isAr ? 'جاري الفتح...' : 'Opening...',
+    // Stats
+    stats: [
+      { value: '500+',    label: isAr ? 'عميل تمت إدارته'  : 'Clients Managed' },
+      { value: '12,000+', label: isAr ? 'مهمة تم تتبعها'  : 'Tasks Tracked' },
+      { value: '99%',     label: isAr ? 'نسبة التشغيل'     : 'Uptime' },
+      { value: '24/7',    label: isAr ? 'وصول بلا انقطاع' : 'Always Available' },
+    ],
+    // Features section
+    featuresLabel: isAr ? 'المميزات' : 'Features',
+    featuresH2:    isAr ? 'كل ما تحتاجه لإدارة شركتك' : 'Everything You Need to Manage Your Business',
+    featuresSub:   isAr ? 'منصة متكاملة تجمع كل أدوات إدارة الأعمال في مكان واحد' : 'An integrated platform bringing all business management tools together',
+    features: [
+      { iconKey: 'crm',       title: isAr ? 'إدارة العملاء CRM'   : 'CRM Management',      desc: isAr ? 'تتبّع كل عميل من أول تواصل حتى إغلاق الصفقة، مع إدارة كاملة للحالة والأولوية والمسؤول.'  : 'Track every client from first contact to closed deal, with full control over status, priority, and assignee.' },
+      { iconKey: 'projects',  title: isAr ? 'إدارة المشاريع'       : 'Project Management',  desc: isAr ? 'أسند المشاريع، تابع التقدم، وشارك البريف مع العملاء مباشرةً من منصة واحدة.'              : 'Assign projects, track progress, and share briefs with clients directly from one platform.' },
+      { iconKey: 'tasks',     title: isAr ? 'المهام والتسليمات'    : 'Tasks & Deliverables', desc: isAr ? 'نظام مهام مرن يربط الفريق بالمشاريع والعملاء، مع تتبع التقدم والمواعيد النهائية.'         : 'A flexible task system connecting your team to projects and clients, with progress and deadline tracking.' },
+      { iconKey: 'finance',   title: isAr ? 'الفواتير والمالية'    : 'Invoices & Finance',  desc: isAr ? 'أنشئ فواتير احترافية، تتبّع المدفوعات، وراقب المصروفات والأرباح في لوحة مالية موحدة.'   : 'Create professional invoices, track payments, and monitor expenses and profits in a unified finance dashboard.' },
+      { iconKey: 'analytics', title: isAr ? 'تقارير وتحليلات'      : 'Reports & Analytics', desc: isAr ? 'لوحة مؤشرات حية توضح الإيرادات والأرباح والأداء — بأرقام حقيقية وفي الوقت الفعلي.'       : 'A live KPI dashboard showing revenues, profits, and performance — in real numbers and real time.' },
+      { iconKey: 'roles',     title: isAr ? 'صلاحيات وأدوار'       : 'Roles & Permissions', desc: isAr ? 'تحكّم في وصول كل مستخدم بدقة — أدمن، مدير، فريق، عميل — مع صلاحيات تفصيلية لكل وحدة.' : 'Fine-grained user access control — admin, manager, team, client — with per-module permission settings.' },
+    ],
+    // Modules section
+    modulesLabel: isAr ? 'الوحدات' : 'Modules',
+    modulesH2:    isAr ? 'نظام متكامل من 9 وحدات' : 'An Integrated System of 9 Modules',
+    modulesSub:   isAr ? 'كل وحدة مصممة لتحل مشكلة محددة وتتكامل مع باقي الوحدات' : 'Each module designed to solve a specific problem and integrate seamlessly with the rest',
+    modules: [
+      { iconKey: 'dashboard', name: 'Dashboard',     desc: isAr ? 'لوحة التحكم'     : 'Control Panel' },
+      { iconKey: 'crm',       name: 'CRM',           desc: isAr ? 'إدارة العملاء'   : 'Client Management' },
+      { iconKey: 'projects',  name: 'Projects',      desc: isAr ? 'المشاريع والبريف' : 'Projects & Briefs' },
+      { iconKey: 'tasks',     name: 'Tasks',         desc: isAr ? 'المهام والتسليم'  : 'Tasks & Handover' },
+      { iconKey: 'team',      name: 'Team',          desc: isAr ? 'الفريق والرواتب'  : 'Team & Payroll' },
+      { iconKey: 'finance',   name: 'Finance',       desc: isAr ? 'الفواتير والمالية': 'Invoices & Finance' },
+      { iconKey: 'templates', name: 'Templates',     desc: isAr ? 'قوالب جاهزة'     : 'Ready Templates' },
+      { iconKey: 'settings',  name: 'Settings',      desc: isAr ? 'الإعدادات'       : 'Settings' },
+      { iconKey: 'portal',    name: 'Client Portal', desc: isAr ? 'بوابة العميل'    : 'Client Portal' },
+    ],
+    // Demo CTA section
+    demoLabel:        isAr ? '⚡ جرّب الآن'                              : '⚡ Try Now',
+    demoH2:           isAr ? 'جرّب Treeelivine ERP بدون إنشاء حساب'    : 'Try Treeelivine ERP Without an Account',
+    demoDesc:         isAr ? 'بيانات تجريبية كاملة — عملاء، مشاريع، مهام، وفواتير — جاهزة فوراً.' : 'Full demo data — clients, projects, tasks, and invoices — ready instantly.',
+    demoCta1:         isAr ? 'ابدأ الديمو الآن'    : 'Start Demo Now',
+    demoCta2:         isAr ? 'إنشاء حساب'          : 'Create Account',
+    demoCredsTitle:   isAr ? 'بيانات الدخول التجريبية' : 'Demo Login Credentials',
+    demoEmailLbl:     isAr ? 'البريد'              : 'Email',
+    demoPassLbl:      isAr ? 'كلمة المرور'         : 'Password',
+    demoRoleLbl:      isAr ? 'الدور'               : 'Role',
+    demoRoleVal:      isAr ? 'Admin — صلاحيات كاملة' : 'Admin — Full Access',
+    demoOpenBtn:      isAr ? 'افتح الديمو ←'       : 'Open Demo →',
+    demoLoadingTxt:   isAr ? 'جاري فتح الديمو...'  : 'Opening demo...',
+    // Testimonials
+    testimonialsLabel: isAr ? 'آراء العملاء'       : 'Reviews',
+    testimonialsH2:    isAr ? 'ماذا يقول مستخدمونا' : 'What Our Users Say',
+    testimonials: [
+      { quote: isAr ? 'Treeelivine غيّر طريقة إدارتنا للفريق. الآن كل شيء في مكان واحد ولا يفوتنا شيء.'       : 'Treeelivine changed how we manage our team. Everything is now in one place and nothing slips through.',        name: isAr ? 'أحمد الزهراني' : 'Ahmed Al-Zahrani', role: isAr ? 'مدير وكالة تسويق'       : 'Marketing Agency Manager',    initials: 'AZ' },
+      { quote: isAr ? 'بوابة العميل رائعة! يقدر عملاؤنا يتابعون مشاريعهم ويوافقون على البريف مباشرةً.'         : 'The client portal is amazing! Our clients can follow their projects and approve briefs directly.',             name: isAr ? 'سارة العمري'   : 'Sara Al-Omari',    role: isAr ? 'CEO — إبداع الرقمي'      : 'CEO — Digital Ibda',          initials: 'SO' },
+      { quote: isAr ? 'الفواتير والمصروفات أصبحت سهلة جداً. وفّرنا ساعات من العمل اليدوي كل أسبوع.'           : 'Invoices and expenses became so easy. We save hours of manual work every week.',                             name: isAr ? 'فهد المطيري'   : 'Fahad Al-Mutairi', role: isAr ? 'مدير مالي'               : 'Finance Manager',             initials: 'FM' },
+      { quote: isAr ? 'إدارة المشاريع والمهام صارت أوضح بكثير. كل فرد في الفريق يعرف مهامه بالضبط.'            : 'Project and task management became much clearer. Every team member knows exactly what to do.',               name: isAr ? 'نورة الشمري'   : 'Noura Al-Shamri',  role: isAr ? 'مديرة مشاريع'            : 'Project Manager',             initials: 'NS' },
+      { quote: isAr ? 'النظام سهّل علينا متابعة العملاء من أول تواصل لحين إغلاق الصفقة. ممتاز جداً.'           : 'The system simplified following up with clients from first contact to closing the deal. Excellent.',          name: isAr ? 'خالد العتيبي'  : 'Khalid Al-Otaibi', role: isAr ? 'مدير مبيعات'             : 'Sales Manager',               initials: 'KO' },
+      { quote: isAr ? 'التقارير المالية الآن تُنجز في دقائق بدلاً من ساعات. ربحنا وقتاً ثميناً جداً.'          : 'Financial reports now take minutes instead of hours. We gained very valuable time.',                         name: isAr ? 'ريم الحارثي'   : 'Reem Al-Harthi',   role: isAr ? 'CFO — نور ميديا'         : 'CFO — Noor Media',            initials: 'RH' },
+      { quote: isAr ? 'صلاحيات الأدوار دقيقة جداً. كل موظف يرى فقط ما يخصه وهذا يحسّن الإنتاجية.'            : 'Role permissions are very precise. Each employee sees only what concerns them, improving productivity.',       name: isAr ? 'طارق السبيعي'  : 'Tariq Al-Subai',   role: isAr ? 'CTO — سحاب تك'          : 'CTO — Sahab Tech',            initials: 'TS' },
+      { quote: isAr ? 'بريف المشاريع ووثائق العميل كلها في مكان واحد. لا مزيد من البريد والواتساب.'             : 'Project briefs and client documents are all in one place. No more email and WhatsApp chains.',                name: isAr ? 'منى القحطاني'  : 'Mona Al-Qahtani',  role: isAr ? 'مديرة محتوى'             : 'Content Manager',             initials: 'MQ' },
+      { quote: isAr ? 'الديمو كان كافياً لأقرر الاشتراك فوراً. النظام واضح وسريع ومُصمَّم للعرب.'              : 'The demo was enough to decide immediately. The system is clear, fast, and built for Arab businesses.',         name: isAr ? 'عمر الدوسري'   : 'Omar Al-Dosari',   role: isAr ? 'صاحب وكالة إبداعية'      : 'Creative Agency Owner',       initials: 'OD' },
+    ],
+    // FAQ
+    faqLabel: isAr ? 'FAQ' : 'FAQ',
+    faqH2:    isAr ? 'أجوبة على أكثر الأسئلة شيوعاً' : 'Answers to the Most Common Questions',
+    faqs: [
+      { q: isAr ? 'هل يمكن تجربة النظام قبل إنشاء حساب؟'  : 'Can I try the system before creating an account?',    a: isAr ? 'نعم! اضغط على "جرّب الديمو" وسيتم إنشاء بيانات تجريبية كاملة وتسجيل دخولك تلقائياً بدون أي خطوات إضافية.' : 'Yes! Click "Try Demo" and full demo data will be created and you\'ll be logged in automatically with no extra steps.' },
+      { q: isAr ? 'هل يعمل النظام على الموبايل؟'            : 'Does the system work on mobile?',                    a: isAr ? 'نعم، النظام مصمم بشكل متجاوب يعمل على جميع الأجهزة — سطح المكتب والتابلت والموبايل.'  : 'Yes, the system is responsively designed and works on all devices — desktop, tablet, and mobile.' },
+      { q: isAr ? 'ما الوحدات المتوفرة في النظام؟'          : 'What modules are available?',                        a: isAr ? 'يضم النظام 9 وحدات: لوحة تحكم، CRM، مشاريع، مهام، فريق، مالية، قوالب، إعدادات، وبوابة عميل.' : 'The system includes 9 modules: Dashboard, CRM, Projects, Tasks, Team, Finance, Templates, Settings, and Client Portal.' },
+      { q: isAr ? 'هل يوجد بوابة للعميل؟'                   : 'Is there a client portal?',                          a: isAr ? 'نعم! يمكن لعملائك الوصول لبوابة خاصة لمتابعة المشاريع، والموافقة على البريف، وعرض الفواتير.' : 'Yes! Your clients can access a private portal to follow projects, approve briefs, and view invoices.' },
+      { q: isAr ? 'هل النظام مصمم للعربية؟'                 : 'Is the system designed for Arabic?',                 a: isAr ? 'نعم، النظام عربي-أول مع دعم كامل للغة الإنجليزية، مع تصميم RTL أصيل وليس مجرد ترجمة.' : 'Yes, the system is Arabic-first with full English support, featuring genuine RTL design — not just a translation.' },
+    ],
+    // Final CTA
+    finalLabel: isAr ? 'ابدأ الآن'                             : 'Get Started',
+    finalH2:    isAr ? 'جاهز لإدارة شركتك بذكاء؟'             : 'Ready to Manage Your Business Smartly?',
+    finalDesc:  isAr ? 'انضم إلى مئات الشركات التي تستخدم Treeelivine ERP لتبسيط عملياتها.' : 'Join hundreds of companies using Treeelivine ERP to streamline their operations.',
+    finalCta1:  isAr ? 'جرّب الديمو'   : 'Try Demo',
+    finalCta2:  isAr ? 'إنشاء حساب'    : 'Create Account',
+    // Footer
+    footerDesc:     isAr ? 'منصة ERP متكاملة لإدارة وكالات التسويق والشركات الخدمية.' : 'An integrated ERP platform for marketing agencies and service companies.',
+    footerProduct:  isAr ? 'المنتج'  : 'Product',
+    footerAccount:  isAr ? 'الحساب' : 'Account',
+    footerSupport:  isAr ? 'الدعم'  : 'Support',
+    footerLogin:    isAr ? 'تسجيل الدخول' : 'Sign In',
+    footerRegister: isAr ? 'إنشاء حساب'   : 'Create Account',
+    footerDemo:     isAr ? 'الديمو'        : 'Demo',
+    footerPrivacy:  isAr ? 'سياسة الخصوصية'  : 'Privacy Policy',
+    footerTerms:    isAr ? 'الشروط والأحكام' : 'Terms & Conditions',
+    footerSupport2: isAr ? 'الدعم الفني'     : 'Support',
+    copyright:      isAr ? `© ${new Date().getFullYear()} treeelivine ERP. جميع الحقوق محفوظة.` : `© ${new Date().getFullYear()} treeelivine ERP. All rights reserved.`,
+    demoFailMsg:    isAr ? 'تعذّر تشغيل الديمو. تأكد من اتصال قاعدة البيانات.' : 'Demo failed. Please check your database connection.',
+  }
   const L = {
     bg: 'var(--bg-app)',
     surface: 'var(--bg-surface)',
@@ -275,7 +341,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div style={{ background: 'var(--bg-app)', color: 'var(--fg-2)', minHeight: '100vh', direction: 'rtl', overflowX: 'hidden' }}>
+    <div style={{ background: 'var(--bg-app)', color: 'var(--fg-2)', minHeight: '100vh', direction: lp.dir as 'rtl'|'ltr', overflowX: 'hidden' }}>
 
       {/* ═══════════════════ GLOBAL STYLES ═══════════════════ */}
       <style>{`
@@ -383,7 +449,7 @@ export default function LandingPage() {
           <span style={{ fontSize: 15, fontWeight: 700, color: L.fg1, letterSpacing: '-0.01em' }}>treeelivine</span>
         </Link>
         <div className="nav-links-d" style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {[{ label: 'المميزات', href: '#features' }, { label: 'الوحدات', href: '#modules' }, { label: 'الأسعار', href: '#pricing' }, { label: 'FAQ', href: '#faq' }].map(l => (
+          {[{ label: lp.navFeatures, href: '#features' }, { label: lp.navModules, href: '#modules' }, { label: lp.navPricing, href: '#pricing' }, { label: 'FAQ', href: '#faq' }].map(l => (
             <a key={l.href} href={l.href} className="ln-link">{l.label}</a>
           ))}
         </div>
@@ -391,17 +457,13 @@ export default function LandingPage() {
           <button className="btn-secondary btn-sm" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
             {lang === 'ar' ? 'EN' : 'AR'}
           </button>
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="btn-secondary btn-sm"
-            style={{ padding: '7px 10px', fontSize: 14 }}
-          >
+          <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-secondary btn-sm" style={{ padding: '7px 10px', fontSize: 14 }}>
             {isDark ? '☀️' : '🌙'}
           </button>
-          <Link href="/login" className="ln-link" style={{ display: 'inline-block' }}>دخول</Link>
-          <Link href="/register" className="btn-secondary btn-sm">حساب جديد</Link>
+          <Link href="/login" className="ln-link" style={{ display: 'inline-block' }}>{lp.navLogin}</Link>
+          <Link href="/register" className="btn-secondary btn-sm">{lp.navRegister}</Link>
           <button onClick={handleDemo} disabled={demoLoading} className="btn-primary btn-sm" style={{ opacity: demoLoading ? 0.75 : 1 }}>
-            {demoLoading ? 'جاري...' : 'جرّب الديمو'}
+            {demoLoading ? '...' : lp.navDemo}
           </button>
         </div>
       </nav>
@@ -422,38 +484,38 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <span style={{ fontSize: 12, color: L.fg3, fontWeight: 500 }}>موثوق من مئات الوكالات</span>
+            <span style={{ fontSize: 12, color: L.fg3, fontWeight: 500 }}>{lp.trustBadge}</span>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2f8a3e', display: 'inline-block', flexShrink: 0 }} />
           </div>
 
           {/* Main headline — word by word on load */}
           <h1 style={{ fontSize: 'clamp(30px,5.5vw,62px)', fontWeight: 800, lineHeight: 1.12, color: L.fg1, letterSpacing: '-0.025em', marginBottom: 18 }}>
-            {['شغّل', 'شركتك', 'بالكامل'].map((w, i) => (
+            {lp.heroLine1.map((w, i) => (
               <span key={i} className="hero-word" style={{ animationDelay: `${i * 90}ms` }}>{w} </span>
             ))}
             <br />
             <span style={{ color: L.olive }}>
-              {['من', 'منصة', 'ERP', 'واحدة'].map((w, i) => (
-                <span key={i} className="hero-word" style={{ animationDelay: `${270 + i * 90}ms` }}>{w} </span>
+              {lp.heroLine2.map((w, i) => (
+                <span key={i} className="hero-word" style={{ animationDelay: `${lp.heroLine1.length * 90 + i * 90}ms` }}>{w} </span>
               ))}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p style={{ fontSize: 'clamp(14px,1.9vw,18px)', color: L.fg4, lineHeight: 1.75, maxWidth: 580, margin: '0 auto 28px', animation: 'wordIn 0.7s ease 0.5s both' }}>
-            إدارة العملاء، المشاريع، المهام، الفواتير، والمالية — كل شيء في لوحة تحكم واحدة مصممة لوكالات التسويق.
+            {lp.heroSub}
           </p>
 
           {/* CTAs */}
           <div className="hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 10, animation: 'wordIn 0.7s ease 0.7s both' }}>
             <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1, fontSize: 16, padding: '14px 30px' }}>
-              {demoLoading ? 'جاري الفتح...' : 'جرّب الديمو مجاناً'}
+              {demoLoading ? lp.heroLoading : lp.heroCta1}
             </button>
-            <Link href="/register" className="btn-secondary" style={{ fontSize: 16, padding: '14px 28px' }}>إنشاء حساب</Link>
+            <Link href="/register" className="btn-secondary" style={{ fontSize: 16, padding: '14px 28px' }}>{lp.heroCta2}</Link>
           </div>
           <p style={{ fontSize: 12, color: L.fg5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, animation: 'wordIn 0.7s ease 0.85s both' }}>
             <span style={{ color: '#2f8a3e', fontWeight: 700 }}>✓</span>
-            بدون بطاقة ائتمانية · بدون تسجيل
+            {lp.heroNote}
           </p>
         </div>
 
@@ -507,7 +569,7 @@ export default function LandingPage() {
       <div style={{ borderTop: `1px solid ${L.border}` }} />
       <section className="reveal-section" style={{ padding: '40px clamp(16px,4vw,24px)', background: L.surface }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 24, textAlign: 'center' }} className="stats-row">
-          {stats.map((s, i) => (
+          {lp.stats.map((s, i) => (
             <div key={i} style={{ transitionDelay: `${i * 80}ms` }} className="aw-wrap">
               <div style={{ fontSize: 'clamp(24px,3vw,36px)', fontWeight: 800, color: L.olive, fontVariantNumeric: 'tabular-nums', marginBottom: 4 }}>
                 <AnimatedWords text={s.value} baseDelay={i * 60} />
@@ -523,16 +585,16 @@ export default function LandingPage() {
       <section id="features" style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="reveal-section" style={{ textAlign: 'center', marginBottom: 52 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>المميزات</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>{lp.featuresLabel}</div>
             <h2 style={{ fontSize: 'clamp(22px,3.5vw,38px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.015em', marginBottom: 12 }}>
-              <AnimatedWords text="كل ما تحتاجه لإدارة شركتك" />
+              <AnimatedWords text={lp.featuresH2} />
             </h2>
             <p style={{ fontSize: 14, color: L.fg3, maxWidth: 520, margin: '0 auto', lineHeight: 1.75 }}>
-              <AnimatedWords text="منصة متكاملة تجمع كل أدوات إدارة الأعمال في مكان واحد" baseDelay={300} />
+              <AnimatedWords text={lp.featuresSub} baseDelay={300} />
             </p>
           </div>
           <div className="cards-container features-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-            {features.map((f, i) => <FeatureCard key={i} {...f} />)}
+            {lp.features.map((f, i) => <FeatureCard key={i} {...f} />)}
           </div>
         </div>
       </section>
@@ -541,16 +603,16 @@ export default function LandingPage() {
       <section id="modules" style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)', background: L.surface, borderTop: `1px solid ${L.border}`, borderBottom: `1px solid ${L.border}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="reveal-section" style={{ textAlign: 'center', marginBottom: 52 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>الوحدات</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>{lp.modulesLabel}</div>
             <h2 style={{ fontSize: 'clamp(22px,3.5vw,38px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.015em', marginBottom: 12 }}>
-              <AnimatedWords text="نظام متكامل من 9 وحدات" />
+              <AnimatedWords text={lp.modulesH2} />
             </h2>
             <p style={{ fontSize: 14, color: L.fg3, maxWidth: 520, margin: '0 auto', lineHeight: 1.75 }}>
-              <AnimatedWords text="كل وحدة مصممة لتحل مشكلة محددة وتتكامل مع باقي الوحدات" baseDelay={280} />
+              <AnimatedWords text={lp.modulesSub} baseDelay={280} />
             </p>
           </div>
           <div className="cards-container modules-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(9,1fr)', gap: 10 }}>
-            {modules.map((m, i) => <ModuleBadge key={i} {...m} />)}
+            {lp.modules.map((m, i) => <ModuleBadge key={i} {...m} />)}
           </div>
         </div>
       </section>
@@ -565,24 +627,24 @@ export default function LandingPage() {
           }}>
             <div style={{ position: 'absolute', top: -80, insetInlineEnd: -80, width: 280, height: 280, borderRadius: '50%', background: L.oliveL, pointerEvents: 'none' }} />
             <div style={{ position: 'relative' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>⚡ جرّب الآن</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>{lp.demoLabel}</div>
               <h2 style={{ fontSize: 'clamp(20px,3vw,32px)', fontWeight: 700, color: L.fg1, marginBottom: 14, lineHeight: 1.25, letterSpacing: '-0.015em' }}>
-                <AnimatedWords text="جرّب Treeelivine ERP بدون إنشاء حساب" />
+                <AnimatedWords text={lp.demoH2} />
               </h2>
-              <p style={{ color: L.fg3, lineHeight: 1.7, marginBottom: 24, fontSize: 13 }}>بيانات تجريبية كاملة — عملاء، مشاريع، مهام، وفواتير — جاهزة فوراً.</p>
+              <p style={{ color: L.fg3, lineHeight: 1.7, marginBottom: 24, fontSize: 13 }}>{lp.demoDesc}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                 <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1 }}>
-                  {demoLoading ? 'جاري الفتح...' : 'ابدأ الديمو الآن'}
+                  {demoLoading ? lp.demoLoadingTxt : lp.demoCta1}
                 </button>
-                <Link href="/register" className="btn-secondary">إنشاء حساب</Link>
+                <Link href="/register" className="btn-secondary">{lp.demoCta2}</Link>
               </div>
             </div>
             <div style={{ background: L.bg, border: `1px solid ${L.border}`, borderRadius: 12, padding: 20, position: 'relative' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', color: L.olive, marginBottom: 16 }}>بيانات الدخول التجريبية</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', color: L.olive, marginBottom: 16 }}>{lp.demoCredsTitle}</div>
               {[
-                { label: 'البريد', value: 'demo@treeelivine.com' },
-                { label: 'كلمة المرور', value: 'demo1234' },
-                { label: 'الدور', value: 'Admin — صلاحيات كاملة' },
+                { label: lp.demoEmailLbl, value: 'demo@treeelivine.com' },
+                { label: lp.demoPassLbl,  value: 'demo1234' },
+                { label: lp.demoRoleLbl,  value: lp.demoRoleVal },
               ].map((r, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: L.surface, borderRadius: 6, fontSize: 13, marginBottom: 8 }}>
                   <span style={{ color: L.fg4 }}>{r.label}</span>
@@ -590,7 +652,7 @@ export default function LandingPage() {
                 </div>
               ))}
               <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 4, opacity: demoLoading ? 0.75 : 1 }}>
-                {demoLoading ? 'جاري فتح الديمو...' : 'افتح الديمو →'}
+                {demoLoading ? lp.demoLoadingTxt : lp.demoOpenBtn}
               </button>
             </div>
           </div>
@@ -601,16 +663,16 @@ export default function LandingPage() {
       <section style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)', background: L.surface, borderTop: `1px solid ${L.border}`, borderBottom: `1px solid ${L.border}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
           <div className="reveal-section" style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>آراء العملاء</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>{lp.testimonialsLabel}</div>
             <h2 style={{ fontSize: 'clamp(22px,3.5vw,38px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.015em' }}>
-              <AnimatedWords text="ماذا يقول مستخدمونا" />
+              <AnimatedWords text={lp.testimonialsH2} />
             </h2>
           </div>
 
           {/* Carousel */}
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
-              {testimonials.slice(carouselIdx * 3, carouselIdx * 3 + 3).map((t, i) => (
+              {lp.testimonials.slice(carouselIdx * 3, carouselIdx * 3 + 3).map((t, i) => (
                 <TestimonialCard key={carouselIdx * 3 + i} {...t} />
               ))}
             </div>
@@ -647,13 +709,13 @@ export default function LandingPage() {
       <section id="faq" style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="reveal-section" style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>FAQ</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>{lp.faqLabel}</div>
             <h2 style={{ fontSize: 'clamp(22px,3.5vw,38px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.015em' }}>
-              <AnimatedWords text="أجوبة على أكثر الأسئلة شيوعاً" />
+              <AnimatedWords text={lp.faqH2} />
             </h2>
           </div>
           <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {faqs.map((f, i) => <FAQItem key={i} {...f} />)}
+            {lp.faqs.map((f, i) => <FAQItem key={i} {...f} />)}
           </div>
         </div>
       </section>
@@ -668,22 +730,22 @@ export default function LandingPage() {
         </div>
         <div className="reveal-section" style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center', position: 'relative' }}>
           <div style={{ display: 'inline-block', padding: '4px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', fontSize: 12, color: 'white', fontWeight: 500, marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            ابدأ الآن
+            {lp.finalLabel}
           </div>
           <h2 style={{ fontSize: 'clamp(24px,4.5vw,46px)', fontWeight: 800, color: 'white', marginBottom: 16, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-            <AnimatedWords text="جاهز لإدارة شركتك بذكاء؟" />
+            <AnimatedWords text={lp.finalH2} />
           </h2>
           <p style={{ fontSize: 'clamp(14px,1.8vw,17px)', color: 'rgba(255,255,255,0.75)', maxWidth: 460, margin: '0 auto 36px', lineHeight: 1.7 }}>
-            انضم إلى مئات الشركات التي تستخدم Treeelivine ERP لتبسيط عملياتها.
+            {lp.finalDesc}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={handleDemo} disabled={demoLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '14px 30px', background: 'white', color: '#4f6831', borderRadius: 10, fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: demoLoading ? 0.75 : 1, transition: 'transform 0.12s', fontFamily: 'inherit' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'}>
-              {demoLoading ? '...' : 'جرّب الديمو'}
+              {demoLoading ? '...' : lp.finalCta1}
             </button>
             <Link href="/register" style={{ display: 'inline-flex', alignItems: 'center', padding: '14px 28px', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid rgba(255,255,255,0.3)', textDecoration: 'none' }}>
-              إنشاء حساب
+              {lp.finalCta2}
             </Link>
           </div>
         </div>
@@ -698,12 +760,12 @@ export default function LandingPage() {
                 <BrandMark size={22} />
                 <span style={{ fontSize: 15, fontWeight: 700, color: L.fg1, letterSpacing: '-0.01em' }}>treeelivine</span>
               </div>
-              <p style={{ color: L.fg4, fontSize: 13, lineHeight: 1.7, maxWidth: 220 }}>منصة ERP متكاملة لإدارة وكالات التسويق والشركات الخدمية.</p>
+              <p style={{ color: L.fg4, fontSize: 13, lineHeight: 1.7, maxWidth: 220 }}>{lp.footerDesc}</p>
             </div>
             {[
-              { title: 'المنتج',  links: [{ l: 'المميزات', h: '#features' }, { l: 'الوحدات', h: '#modules' }, { l: 'الأسعار', h: '#pricing' }, { l: 'FAQ', h: '#faq' }] },
-              { title: 'الحساب', links: [{ l: 'تسجيل الدخول', h: '/login' }, { l: 'إنشاء حساب', h: '/register' }, { l: 'الديمو', h: '#pricing' }] },
-              { title: 'الدعم',  links: [{ l: 'سياسة الخصوصية', h: '/privacy' }, { l: 'الشروط والأحكام', h: '/terms' }, { l: 'الدعم الفني', h: '/support' }] },
+              { title: lp.footerProduct, links: [{ l: lp.navFeatures, h: '#features' }, { l: lp.navModules, h: '#modules' }, { l: lp.navPricing, h: '#pricing' }, { l: 'FAQ', h: '#faq' }] },
+              { title: lp.footerAccount, links: [{ l: lp.footerLogin, h: '/login' }, { l: lp.footerRegister, h: '/register' }, { l: lp.footerDemo, h: '#pricing' }] },
+              { title: lp.footerSupport, links: [{ l: lp.footerPrivacy, h: '/privacy' }, { l: lp.footerTerms, h: '/terms' }, { l: lp.footerSupport2, h: '/support' }] },
             ].map((col, i) => (
               <div key={i}>
                 <p style={{ fontWeight: 600, fontSize: 11, color: L.fg3, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{col.title}</p>
@@ -714,9 +776,9 @@ export default function LandingPage() {
             ))}
           </div>
           <div style={{ borderTop: `1px solid ${L.border}`, paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-            <p style={{ fontSize: 12, color: L.fg5 }}>© {new Date().getFullYear()} treeelivine ERP. جميع الحقوق محفوظة.</p>
+            <p style={{ fontSize: 12, color: L.fg5 }}>{lp.copyright}</p>
             <div style={{ display: 'flex', gap: 16 }}>
-              {[{ l: 'سياسة الخصوصية', h: '/privacy' }, { l: 'الشروط', h: '/terms' }].map((lk, i) => (
+              {[{ l: lp.footerPrivacy, h: '/privacy' }, { l: lp.footerTerms, h: '/terms' }].map((lk, i) => (
                 <a key={i} href={lk.h} style={{ fontSize: 12, color: L.fg5, textDecoration: 'none' }}
                   onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = L.fg3}
                   onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = L.fg5}
