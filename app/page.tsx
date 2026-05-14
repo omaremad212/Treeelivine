@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useApp } from '@/contexts/AppContext'
 
 /* ── Brand logo ──────────────────────────────────────────────────────── */
 function BrandMark({ size = 28 }: { size?: number }) {
@@ -67,13 +68,13 @@ const FeatureIcons: Record<string, React.ReactNode> = {
 function FeatureCard({ iconKey, title, desc }: { iconKey: string; title: string; desc: string }) {
   return (
     <div className="fade-card feature-card" style={{
-      background: '#ffffff', border: '1px solid #e6e2d9', borderRadius: 12, padding: 24,
+      background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24,
     }}>
-      <div style={{ width: 44, height: 44, borderRadius: 10, background: '#f3f6ee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f6831', marginBottom: 16 }}>
+      <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--brand-primary-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)', marginBottom: 16 }}>
         {FeatureIcons[iconKey]}
       </div>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#292723', marginBottom: 8 }}>{title}</h3>
-      <p style={{ fontSize: 13, color: '#75705f', lineHeight: 1.65 }}>{desc}</p>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--fg-1)', marginBottom: 8 }}>{title}</h3>
+      <p style={{ fontSize: 13, color: 'var(--fg-4)', lineHeight: 1.65 }}>{desc}</p>
     </div>
   )
 }
@@ -94,14 +95,14 @@ const ModuleIcons: Record<string, React.ReactNode> = {
 function ModuleBadge({ iconKey, name, desc }: { iconKey: string; name: string; desc: string }) {
   return (
     <div className="fade-card module-badge" style={{
-      background: '#ffffff', border: '1px solid #e6e2d9', borderRadius: 12, padding: 20,
+      background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 20,
       textAlign: 'center',
     }}>
-      <div style={{ color: '#4f6831', display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+      <div style={{ color: 'var(--brand-primary)', display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
         {ModuleIcons[iconKey]}
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#292723', marginBottom: 2 }}>{name}</div>
-      <div style={{ fontSize: 11, color: '#75705f' }}>{desc}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-1)', marginBottom: 2 }}>{name}</div>
+      <div style={{ fontSize: 11, color: 'var(--fg-4)' }}>{desc}</div>
     </div>
   )
 }
@@ -109,14 +110,14 @@ function ModuleBadge({ iconKey, name, desc }: { iconKey: string; name: string; d
 /* ── Testimonial ──────────────────────────────────────────────────────── */
 function TestimonialCard({ quote, name, role, initials }: { quote: string; name: string; role: string; initials: string }) {
   return (
-    <div className="fade-card" style={{ background: '#ffffff', border: '1px solid #e6e2d9', borderRadius: 12, padding: 24 }}>
-      <div style={{ fontSize: 32, color: '#4f6831', lineHeight: 1, marginBottom: 16, opacity: 0.4 }}>"</div>
-      <p style={{ fontSize: 13, color: '#57534a', lineHeight: 1.7, marginBottom: 20 }}>{quote}</p>
+    <div className="fade-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-1)', borderRadius: 12, padding: 24 }}>
+      <div style={{ fontSize: 32, color: 'var(--brand-primary)', lineHeight: 1, marginBottom: 16, opacity: 0.4 }}>"</div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>{quote}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#4f6831', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{initials}</div>
+        <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{initials}</div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#292723' }}>{name}</div>
-          <div style={{ fontSize: 11, color: '#75705f' }}>{role}</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-1)' }}>{name}</div>
+          <div style={{ fontSize: 11, color: 'var(--fg-4)' }}>{role}</div>
         </div>
       </div>
     </div>
@@ -127,15 +128,15 @@ function TestimonialCard({ quote, name, role, initials }: { quote: string; name:
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{ border: '1px solid #e6e2d9', borderRadius: 8, overflow: 'hidden', background: '#ffffff' }}>
+    <div style={{ border: '1px solid var(--border-1)', borderRadius: 8, overflow: 'hidden', background: 'var(--bg-surface)' }}>
       <button
         onClick={() => setOpen(p => !p)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: 'none', border: 'none', color: '#292723', fontSize: 13, fontWeight: 500, cursor: 'pointer', textAlign: 'start', fontFamily: 'inherit', gap: 16 }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: 'none', border: 'none', color: 'var(--fg-1)', fontSize: 13, fontWeight: 500, cursor: 'pointer', textAlign: 'start', fontFamily: 'inherit', gap: 16 }}
       >
         <span>{q}</span>
-        <span style={{ color: '#4f6831', fontSize: 18, fontWeight: 300, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
+        <span style={{ color: 'var(--brand-primary)', fontSize: 18, fontWeight: 300, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
       </button>
-      {open && <div style={{ padding: '0 20px 16px', color: '#57534a', fontSize: 13, lineHeight: 1.7 }}>{a}</div>}
+      {open && <div style={{ padding: '0 20px 16px', color: 'var(--fg-3)', fontSize: 13, lineHeight: 1.7 }}>{a}</div>}
     </div>
   )
 }
@@ -145,6 +146,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 ═══════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const router = useRouter()
+  const { theme, setTheme } = useApp()
   const [demoLoading, setDemoLoading] = useState(false)
   const [navScrolled, setNavScrolled] = useState(false)
 
@@ -265,15 +267,25 @@ export default function LandingPage() {
     { q: 'هل النظام مصمم للعربية؟', a: 'نعم، النظام عربي-أول مع دعم كامل للغة الإنجليزية، مع تصميم RTL أصيل وليس مجرد ترجمة.' },
   ]
 
+  const isDark = theme === 'dark'
   const L = {
-    bg: '#f5f4f0', surface: '#ffffff', border: '#e6e2d9', border2: '#d8d3c7',
-    fg1: '#292723', fg2: '#3e3b34', fg3: '#57534a', fg4: '#75705f', fg5: '#98927f',
-    olive: '#4f6831', oliveL: '#f3f6ee', olive2: '#e4ebd5',
-    navBg: 'rgba(255,255,255,0.92)',
+    bg: 'var(--bg-app)',
+    surface: 'var(--bg-surface)',
+    border: 'var(--border-1)',
+    border2: 'var(--border-2)',
+    fg1: 'var(--fg-1)',
+    fg2: 'var(--fg-2)',
+    fg3: 'var(--fg-3)',
+    fg4: 'var(--fg-4)',
+    fg5: 'var(--fg-5)',
+    olive: 'var(--brand-primary)',
+    oliveL: 'var(--brand-primary-soft)',
+    olive2: 'var(--brand-olive-100)',
+    navBg: isDark ? 'rgba(20,20,15,0.92)' : 'rgba(255,255,255,0.92)',
   }
 
   return (
-    <div style={{ background: L.bg, color: L.fg2, minHeight: '100vh', direction: 'rtl', overflowX: 'hidden' }}>
+    <div style={{ background: 'var(--bg-app)', color: 'var(--fg-2)', minHeight: '100vh', direction: 'rtl', overflowX: 'hidden' }}>
 
       {/* ═══════════════════ GLOBAL STYLES ═══════════════════ */}
       <style>{`
@@ -384,10 +396,18 @@ export default function LandingPage() {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="btn-secondary btn-sm"
+            style={{ padding: '7px 10px', fontSize: 14 }}
+            title={isDark ? 'وضع فاتح' : 'وضع داكن'}
+          >
+            {isDark ? '☀️' : '🌙'}
+          </button>
           <Link href="/login" className="ln-link" style={{ display: 'inline-block' }}>دخول</Link>
           <Link href="/register" className="btn-secondary btn-sm">حساب جديد</Link>
           <button onClick={handleDemo} disabled={demoLoading} className="btn-primary btn-sm" style={{ opacity: demoLoading ? 0.75 : 1 }}>
-            {demoLoading ? '⏳' : '🚀'} {demoLoading ? '...' : 'جرّب الديمو'}
+            {demoLoading ? 'جاري...' : 'جرّب الديمو'}
           </button>
         </div>
       </nav>
@@ -468,7 +488,7 @@ export default function LandingPage() {
           {/* CTAs */}
           <div className="hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12, animation: 'wordIn 0.7s ease 0.7s both' }}>
             <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1, fontSize: 16, padding: '14px 30px' }}>
-              {demoLoading ? '⏳ جاري الفتح...' : '🚀 جرّب الديمو مجاناً'}
+              {demoLoading ? 'جاري الفتح...' : 'جرّب الديمو مجاناً'}
             </button>
             <Link href="/register" className="btn-secondary" style={{ fontSize: 16, padding: '14px 28px' }}>إنشاء حساب</Link>
           </div>
@@ -479,21 +499,47 @@ export default function LandingPage() {
         </div>
 
         {/* ── Dashboard with perspective tilt ── */}
-        <div style={{ marginTop: 52, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
-          {/* Bottom fade mask */}
-          <div style={{ position: 'absolute', bottom: 0, insetInline: 0, height: '45%', background: `linear-gradient(to top, ${L.bg}, transparent)`, zIndex: 2, pointerEvents: 'none' }} />
+        <div style={{ marginTop: 36, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
+          {/* Bottom fade mask — shorter so more of image shows */}
+          <div style={{ position: 'absolute', bottom: 0, insetInline: 0, height: '22%', background: `linear-gradient(to top, var(--bg-app), transparent)`, zIndex: 2, pointerEvents: 'none' }} />
 
           {/* Glow under mockup */}
-          <div style={{ position: 'absolute', bottom: '10%', left: '50%', transform: 'translateX(-50%)', width: '70%', height: 60, background: 'rgba(79,104,49,0.18)', filter: 'blur(40px)', pointerEvents: 'none', zIndex: 0 }} />
+          <div style={{ position: 'absolute', bottom: '8%', left: '50%', transform: 'translateX(-50%)', width: '60%', height: 80, background: 'rgba(79,104,49,0.2)', filter: 'blur(52px)', pointerEvents: 'none', zIndex: 0 }} />
 
           <div id="hero-dashboard" style={{ maxWidth: 1060, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+            {/* Outer card with browser chrome */}
             <div style={{
-              borderRadius: 16, overflow: 'hidden',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08)',
+              borderRadius: 18,
+              overflow: 'hidden',
+              boxShadow: '0 2px 0 1px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.14), 0 32px 80px rgba(0,0,0,0.22), 0 64px 120px rgba(0,0,0,0.12)',
               border: `1px solid ${L.border}`,
+              background: 'var(--bg-surface)',
             }}>
+              {/* Browser chrome bar */}
+              <div style={{
+                background: 'var(--bg-surface-2)',
+                borderBottom: `1px solid ${L.border}`,
+                padding: '10px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {['#ff5f57','#febc2e','#28c840'].map(c => (
+                    <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />
+                  ))}
+                </div>
+                <div style={{ flex: 1, background: 'var(--bg-app)', borderRadius: 6, height: 22, maxWidth: 280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                  <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="var(--fg-4)" strokeWidth={2}><circle cx={12} cy={12} r={10}/><path d="M2 12h20"/></svg>
+                  <span style={{ fontSize: 10, color: 'var(--fg-4)', fontFamily: 'monospace' }}>app.treeelivine.com</span>
+                </div>
+              </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dashboard-light.png" alt="Treeelivine Dashboard" style={{ width: '100%', display: 'block' }} />
+              <img
+                src={isDark ? '/dashboard-dark.png' : '/dashboard-light.png'}
+                alt="Treeelivine Dashboard"
+                style={{ width: '100%', display: 'block' }}
+              />
             </div>
           </div>
         </div>
@@ -568,7 +614,7 @@ export default function LandingPage() {
               <p style={{ color: L.fg3, lineHeight: 1.7, marginBottom: 24, fontSize: 13 }}>بيانات تجريبية كاملة — عملاء، مشاريع، مهام، وفواتير — جاهزة فوراً.</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                 <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1 }}>
-                  {demoLoading ? '⏳ جاري الفتح...' : '🚀 ابدأ الديمو الآن'}
+                  {demoLoading ? 'جاري الفتح...' : 'ابدأ الديمو الآن'}
                 </button>
                 <Link href="/register" className="btn-secondary">إنشاء حساب</Link>
               </div>
@@ -586,7 +632,7 @@ export default function LandingPage() {
                 </div>
               ))}
               <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 4, opacity: demoLoading ? 0.75 : 1 }}>
-                {demoLoading ? 'جاري فتح الديمو...' : 'Open Demo →'}
+                {demoLoading ? 'جاري فتح الديمو...' : 'افتح الديمو →'}
               </button>
             </div>
           </div>
@@ -645,7 +691,7 @@ export default function LandingPage() {
             <button onClick={handleDemo} disabled={demoLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '14px 30px', background: 'white', color: '#4f6831', borderRadius: 10, fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: demoLoading ? 0.75 : 1, transition: 'transform 0.12s', fontFamily: 'inherit' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'}>
-              {demoLoading ? '⏳ ...' : '🚀 جرّب الديمو'}
+              {demoLoading ? '...' : 'جرّب الديمو'}
             </button>
             <Link href="/register" style={{ display: 'inline-flex', alignItems: 'center', padding: '14px 28px', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid rgba(255,255,255,0.3)', textDecoration: 'none' }}>
               إنشاء حساب
