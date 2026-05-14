@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     .select('*, customer:customers(id,name,company), assignee:employees(id,name)')
     .order('created_at', { ascending: false })
 
+  if (!user.isDemo) query = query.eq('is_demo', false)
   if (status)   query = query.eq('status', status)
   if (priority) query = query.eq('priority', priority)
   if (search)   query = query.ilike('title', `%${search}%`)

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     .select('*, project:projects(id,name), assignee:employees(id,name,email,internal_role)')
     .order('due_date', { ascending: true, nullsFirst: false })
 
+  if (!user.isDemo) query = query.eq('is_demo', false)
   if (status) query = query.eq('status', status)
   if (projectId) query = query.eq('project_id', projectId)
   if (assigneeId) query = query.eq('current_assignee_id', assigneeId)
