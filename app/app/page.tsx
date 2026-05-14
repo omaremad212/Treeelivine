@@ -126,7 +126,7 @@ function SimpleBarChart({ revenue, expenses }: { revenue: number; expenses: numb
 }
 
 export default function DashboardPage() {
-  const { t, settings, user } = useApp()
+  const { t, settings, user, lang } = useApp()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [range, setRange] = useState('30d')
@@ -140,9 +140,11 @@ export default function DashboardPage() {
   }, [range])
 
   const cur = settings?.defaultCurrency || 'SAR'
-  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'
-  const greeting = new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'
-  const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || ''
+  const hr = new Date().getHours()
+  const greeting = hr < 12 ? t.greetingMorning : hr < 17 ? t.greetingAfternoon : t.greetingEvening
+  const locale = lang === 'ar' ? 'ar-SA' : 'en-US'
+  const todayStr = new Date().toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
     <div style={{ padding: '1.75rem 2rem', flex: 1, minHeight: 0 }}>
@@ -153,7 +155,7 @@ export default function DashboardPage() {
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '0.25rem' }}>
             {greeting}, {firstName}
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--fg-4)' }}>{todayStr} — here&apos;s what&apos;s happening</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--fg-4)' }}>{todayStr} — {t.greetingSubtitle}</p>
         </div>
         <div style={{ display: 'flex', gap: '0.3rem', background: 'var(--surface2)', borderRadius: 8, padding: '0.25rem' }}>
           {DATE_RANGES.map(r => (
@@ -173,14 +175,14 @@ export default function DashboardPage() {
         <>
           {/* KPI Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            <KpiTile title={t.revenue || 'Revenue'} value={`${cur} ${(data.revenue || 0).toLocaleString()}`} icon={<Icons.Revenue />} color="#4f6831" />
-            <KpiTile title={t.expenses || 'Expenses'} value={`${cur} ${(data.expenses || 0).toLocaleString()}`} icon={<Icons.Expenses />} color="#ef4444" />
-            <KpiTile title={t.profit || 'Net Profit'} value={`${cur} ${(data.profit || 0).toLocaleString()}`} icon={<Icons.Profit />} color="#0284c7" sub={(data.revenue > 0 ? ((data.profit / data.revenue) * 100).toFixed(1) : '0') + '% margin'} />
-            <KpiTile title={t.customers || 'Customers'} value={data.customers || 0} icon={<Icons.Customers />} color="#7c3aed" />
-            <KpiTile title={t.activeProjects || 'Active Projects'} value={data.activeProjects || 0} icon={<Icons.Projects />} color="#d97706" />
-            <KpiTile title={t.pendingTasks || 'Pending Tasks'} value={data.pendingTasks || 0} icon={<Icons.Tasks />} color="#0891b2" />
-            <KpiTile title={t.overdueTasks || 'Overdue'} value={data.overdueTasks || 0} icon={<Icons.Overdue />} color="#dc2626" />
-            <KpiTile title={t.unpaidInvoices || 'Unpaid Invoices'} value={data.unpaidInvoices || 0} icon={<Icons.Invoices />} color="#ca8a04" />
+            <KpiTile title={t.revenue} value={`${cur} ${(data.revenue || 0).toLocaleString()}`} icon={<Icons.Revenue />} color="#4f6831" />
+            <KpiTile title={t.expenses} value={`${cur} ${(data.expenses || 0).toLocaleString()}`} icon={<Icons.Expenses />} color="#ef4444" />
+            <KpiTile title={t.profit} value={`${cur} ${(data.profit || 0).toLocaleString()}`} icon={<Icons.Profit />} color="#0284c7" sub={(data.revenue > 0 ? ((data.profit / data.revenue) * 100).toFixed(1) : '0') + `% ${t.marginLabel}`} />
+            <KpiTile title={t.customers} value={data.customers || 0} icon={<Icons.Customers />} color="#7c3aed" />
+            <KpiTile title={t.activeProjects} value={data.activeProjects || 0} icon={<Icons.Projects />} color="#d97706" />
+            <KpiTile title={t.pendingTasks} value={data.pendingTasks || 0} icon={<Icons.Tasks />} color="#0891b2" />
+            <KpiTile title={t.overdueTasks} value={data.overdueTasks || 0} icon={<Icons.Overdue />} color="#dc2626" />
+            <KpiTile title={t.unpaidInvoices} value={data.unpaidInvoices || 0} icon={<Icons.Invoices />} color="#ca8a04" />
           </div>
 
           {/* Bottom row: Chart + Quick Actions + Activity */}
@@ -190,17 +192,17 @@ export default function DashboardPage() {
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                  <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)' }}>Revenue vs Expenses</h3>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--fg-4)', marginTop: 2 }}>Monthly overview — {new Date().getFullYear()}</p>
+                  <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)' }}>{t.revenueVsExpenses}</h3>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.monthlyOverview} — {new Date().getFullYear()}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', fontSize: '0.72rem', color: 'var(--fg-4)' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--accent)', display: 'inline-block' }} />
-                    Revenue
+                    {t.revenue}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ width: 10, height: 10, borderRadius: 2, background: '#ef4444cc', display: 'inline-block' }} />
-                    Expenses
+                    {t.expenses}
                   </span>
                 </div>
               </div>
@@ -209,12 +211,12 @@ export default function DashboardPage() {
 
             {/* Quick Actions */}
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)', marginBottom: '0.875rem' }}>Quick Actions</h3>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)', marginBottom: '0.875rem' }}>{t.quickActions}</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <QuickAction href="/app/invoices"   icon={<Icons.PlusCircle />} label="New Invoice"    color="#4f6831" />
-                <QuickAction href="/app/clients"    icon={<Icons.UserPlus />}   label="Add Customer"  color="#7c3aed" />
-                <QuickAction href="/app/projects"   icon={<Icons.FolderPlus />} label="New Project"   color="#d97706" />
-                <QuickAction href="/app/financial"  icon={<Icons.Receipt />}    label="Log Expense"   color="#ef4444" />
+                <QuickAction href="/app/invoices"   icon={<Icons.PlusCircle />} label={t.newInvoice}    color="#4f6831" />
+                <QuickAction href="/app/clients"    icon={<Icons.UserPlus />}   label={t.addCustomer}   color="#7c3aed" />
+                <QuickAction href="/app/projects"   icon={<Icons.FolderPlus />} label={t.newProject}    color="#d97706" />
+                <QuickAction href="/app/financial"  icon={<Icons.Receipt />}    label={t.logExpense}    color="#ef4444" />
               </div>
             </div>
           </div>
@@ -224,7 +226,7 @@ export default function DashboardPage() {
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <span style={{ color: 'var(--accent)' }}><Icons.Activity /></span>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)' }}>{t.recentActivity || 'Recent Activity'}</h3>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-1)' }}>{t.recentActivity}</h3>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {data.recentActivity.map((a: any, i: number) => (
