@@ -23,7 +23,7 @@ function OvCard({ label, value, color }: { label: string; value: string; color: 
 }
 
 export default function HRPayrollPage() {
-  const { hasPermission, settings } = useApp()
+  const { t, hasPermission, settings } = useApp()
   const cur = settings?.defaultCurrency || 'SAR'
 
   const [employees,  setEmployees]  = useState<any[]>([])
@@ -91,12 +91,12 @@ export default function HRPayrollPage() {
     <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>HR & Payroll</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Manage employees and salary disbursements</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.hrTitle}</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.hrSubtitle}</p>
         </div>
         {hasPermission('team.write') && (
           <button className="btn btn-primary" onClick={openCreateEmp} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IC d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6" /> Add Employee
+            <IC d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6" /> {t.addEmployee}
           </button>
         )}
       </div>
@@ -105,14 +105,14 @@ export default function HRPayrollPage() {
         <>
           {/* Overview */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '0.875rem', marginBottom: '1.75rem' }}>
-            <OvCard label="Total Employees"    value={String(employees.length)}                     color="var(--fg-1)" />
-            <OvCard label="Monthly Budget"     value={`${cur} ${totalSalaryBudget.toLocaleString()}`} color="#4f6831" />
-            <OvCard label="Paid This Month"    value={`${cur} ${paidThisMonth.toLocaleString()}`}   color="#059669" />
-            <OvCard label="Payroll Records"    value={String(expenses.length)}                      color="#2563eb" />
+            <OvCard label={t.totalEmployees}  value={String(employees.length)}                     color="var(--fg-1)" />
+            <OvCard label={t.monthlyBudget}   value={`${cur} ${totalSalaryBudget.toLocaleString()}`} color="#4f6831" />
+            <OvCard label={t.paidThisMonth}   value={`${cur} ${paidThisMonth.toLocaleString()}`}   color="#059669" />
+            <OvCard label={t.payrollRecords}  value={String(expenses.length)}                      color="#2563eb" />
           </div>
 
           {/* Employee grid */}
-          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Employees</h2>
+          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t.employees}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
             {employees.map((emp, idx) => (
               <div key={emp._id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
@@ -126,7 +126,7 @@ export default function HRPayrollPage() {
                   </div>
                   <div style={{ textAlign: 'end' }}>
                     <p style={{ fontWeight: 700, color: '#4f6831', fontSize: '0.95rem' }}>{cur} {(emp.salary || 0).toLocaleString()}</p>
-                    <p style={{ fontSize: '0.72rem', color: 'var(--fg-4)' }}>/ month</p>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--fg-4)' }}>{t.perMonth}</p>
                   </div>
                 </div>
 
@@ -138,9 +138,9 @@ export default function HRPayrollPage() {
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {hasPermission('team.write') && (
                     <>
-                      <button className="btn btn-secondary" onClick={() => openEditEmp(emp)} style={{ flex: 1, justifyContent: 'center', fontSize: '0.78rem' }}>Edit</button>
-                      <button className="btn btn-primary" onClick={() => openPayroll(emp)} style={{ flex: 1, justifyContent: 'center', fontSize: '0.78rem' }}>Pay Salary</button>
-                      <button className="btn btn-danger" onClick={() => setDeleteTarget(emp)} style={{ fontSize: '0.78rem' }}>Remove</button>
+                      <button className="btn btn-secondary" onClick={() => openEditEmp(emp)} style={{ flex: 1, justifyContent: 'center', fontSize: '0.78rem' }}>{t.edit}</button>
+                      <button className="btn btn-primary" onClick={() => openPayroll(emp)} style={{ flex: 1, justifyContent: 'center', fontSize: '0.78rem' }}>{t.paySalary}</button>
+                      <button className="btn btn-danger" onClick={() => setDeleteTarget(emp)} style={{ fontSize: '0.78rem' }}>{t.delete}</button>
                     </>
                   )}
                 </div>
@@ -148,19 +148,19 @@ export default function HRPayrollPage() {
             ))}
             {employees.length === 0 && (
               <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: 'var(--fg-4)' }}>
-                <p style={{ fontWeight: 500 }}>No employees yet</p>
-                <p style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>Add your first employee to manage payroll</p>
+                <p style={{ fontWeight: 500 }}>{t.noEmployees}</p>
+                <p style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>{t.addFirstEmployee}</p>
               </div>
             )}
           </div>
 
           {/* Payroll log */}
-          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Payroll History</h2>
+          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t.payrollHistory}</h2>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                  {['Employee', 'Description', 'Amount', 'Date'].map(h => (
+                  {[t.name, t.description, t.amount, t.date].map(h => (
                     <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                   ))}
                 </tr>
@@ -177,7 +177,7 @@ export default function HRPayrollPage() {
                   </tr>
                 ))}
                 {expenses.length === 0 && (
-                  <tr><td colSpan={4} style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--fg-4)' }}>No payroll records yet</td></tr>
+                  <tr><td colSpan={4} style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--fg-4)' }}>{t.noPayroll}</td></tr>
                 )}
               </tbody>
             </table>
@@ -185,47 +185,45 @@ export default function HRPayrollPage() {
         </>
       )}
 
-      {/* Add/Edit Employee Modal */}
-      <Modal open={empModal} onClose={() => setEmpModal(false)} title={editing ? 'Edit Employee' : 'Add Employee'} width={480}>
+      <Modal open={empModal} onClose={() => setEmpModal(false)} title={editing ? t.editEmployee : t.addEmployee} width={480}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Full Name *</label><input className="input" value={empForm.name || ''} onChange={e => setEmpForm((p: any) => ({ ...p, name: e.target.value }))} /></div>
-            <div><label className="label">Email</label><input className="input" type="email" value={empForm.email || ''} onChange={e => setEmpForm((p: any) => ({ ...p, email: e.target.value }))} /></div>
+            <div><label className="label">{t.fullName} *</label><input className="input" value={empForm.name || ''} onChange={e => setEmpForm((p: any) => ({ ...p, name: e.target.value }))} /></div>
+            <div><label className="label">{t.email}</label><input className="input" type="email" value={empForm.email || ''} onChange={e => setEmpForm((p: any) => ({ ...p, email: e.target.value }))} /></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Phone</label><input className="input" value={empForm.phone || ''} onChange={e => setEmpForm((p: any) => ({ ...p, phone: e.target.value }))} /></div>
+            <div><label className="label">{t.phone}</label><input className="input" value={empForm.phone || ''} onChange={e => setEmpForm((p: any) => ({ ...p, phone: e.target.value }))} /></div>
             <div>
-              <label className="label">Role / Position</label>
+              <label className="label">{t.rolePosition}</label>
               <select className="input" value={empForm.internalRole || ''} onChange={e => setEmpForm((p: any) => ({ ...p, internalRole: e.target.value }))}>
-                <option value="">Select role…</option>
+                <option value="">{t.selectRoleDots}</option>
                 {EMP_ROLES.map(r => <option key={r} value={r}>{r.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>)}
               </select>
             </div>
           </div>
-          <div><label className="label">Monthly Salary ({cur})</label><input className="input" type="number" value={empForm.salary || ''} onChange={e => setEmpForm((p: any) => ({ ...p, salary: Number(e.target.value) }))} /></div>
+          <div><label className="label">{t.monthlySalary} ({cur})</label><input className="input" type="number" value={empForm.salary || ''} onChange={e => setEmpForm((p: any) => ({ ...p, salary: Number(e.target.value) }))} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setEmpModal(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSaveEmp} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Add Employee'}</button>
+            <button className="btn btn-secondary" onClick={() => setEmpModal(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSaveEmp} disabled={saving}>{saving ? t.saving : editing ? t.saveChanges : t.addEmployee}</button>
           </div>
         </div>
       </Modal>
 
-      {/* Pay Salary Modal */}
-      <Modal open={payModal} onClose={() => setPayModal(false)} title={`Pay Salary — ${payForm.employeeName || ''}`} width={440}>
+      <Modal open={payModal} onClose={() => setPayModal(false)} title={`${t.paySalary} — ${payForm.employeeName || ''}`} width={440}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div><label className="label">Description</label><input className="input" value={payForm.description || ''} onChange={e => setPayForm((p: any) => ({ ...p, description: e.target.value }))} /></div>
+          <div><label className="label">{t.description}</label><input className="input" value={payForm.description || ''} onChange={e => setPayForm((p: any) => ({ ...p, description: e.target.value }))} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Amount ({cur}) *</label><input className="input" type="number" value={payForm.amount || ''} onChange={e => setPayForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
-            <div><label className="label">Date</label><input className="input" type="date" value={payForm.date || ''} onChange={e => setPayForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
+            <div><label className="label">{t.amount} ({cur}) *</label><input className="input" type="number" value={payForm.amount || ''} onChange={e => setPayForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
+            <div><label className="label">{t.date}</label><input className="input" type="date" value={payForm.date || ''} onChange={e => setPayForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setPayModal(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handlePayroll} disabled={saving}>{saving ? 'Processing…' : 'Disburse Salary'}</button>
+            <button className="btn btn-secondary" onClick={() => setPayModal(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handlePayroll} disabled={saving}>{saving ? t.processing : t.disburse}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Remove Employee" message={`Remove "${deleteTarget?.name}" from the team? This cannot be undone.`} loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.removeEmployee} message={`"${deleteTarget?.name}" ${t.removeEmpMsg}`} loading={deleting} />
     </div>
   )
 }

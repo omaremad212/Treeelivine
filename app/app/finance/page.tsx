@@ -75,7 +75,7 @@ export default function FinancePage() {
             </button>
           ))}
         </div>
-        {hasPermission('finance.write') && <button className="btn btn-primary" onClick={openCreate}>+ Add</button>}
+        {hasPermission('finance.write') && <button className="btn btn-primary" onClick={openCreate}>+ {t.add}</button>}
       </div>
 
       {loading ? <LoadingSpinner /> : tab === 'invoices' ? (
@@ -83,7 +83,7 @@ export default function FinancePage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                {['Invoice #', 'Customer', 'Amount', 'Status', 'Due Date', 'Actions'].map(h => (
+                {[t.invoiceNumber, t.customer, t.amount, t.status, t.dueDate, t.actions].map(h => (
                   <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
@@ -99,13 +99,13 @@ export default function FinancePage() {
                   <td style={{ padding: '0.75rem 1rem' }}>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
                       <Link href={`/app/finance/invoices/${inv._id}/pdf`} className="btn btn-secondary" style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>PDF</Link>
-                      {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(inv)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>Edit</button>}
-                      {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(inv)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>Del</button>}
+                      {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(inv)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>{t.edit}</button>}
+                      {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(inv)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>{t.delete}</button>}
                     </div>
                   </td>
                 </tr>
               ))}
-              {invoices.length === 0 && <tr><td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No invoices</td></tr>}
+              {invoices.length === 0 && <tr><td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t.noInvoicesTable}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -140,54 +140,54 @@ export default function FinancePage() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? `Edit ${tab.slice(0, -1)}` : `Add ${tab.slice(0, -1)}`} width={500}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? (tab === 'invoices' ? t.editInvoice : t.editExpense) : (tab === 'invoices' ? t.addInvoice : t.addExpense)} width={500}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {tab === 'invoices' ? (
             <>
-              <div><label className="label">Customer *</label>
+              <div><label className="label">{t.customer} *</label>
                 <select className="input" value={form.customerId || ''} onChange={e => setForm((p: any) => ({ ...p, customerId: e.target.value }))}>
-                  <option value="">Select customer</option>
+                  <option value="">{t.selectCustomer}</option>
                   {customers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                 </select>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <div><label className="label">Status</label>
+                <div><label className="label">{t.status}</label>
                   <select className="input" value={form.status || 'unpaid'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                     {['draft', 'unpaid', 'paid', 'overdue'].map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
-                <div><label className="label">Due Date</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
+                <div><label className="label">{t.dueDate}</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
               </div>
-              <div><label className="label">Notes</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
+              <div><label className="label">{t.notes}</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
             </>
           ) : (
             <>
-              <div><label className="label">Description</label><input className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} /></div>
+              <div><label className="label">{t.description}</label><input className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} /></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <div><label className="label">Amount *</label><input className="input" type="number" value={form.amount || ''} onChange={e => setForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
-                <div><label className="label">Date</label><input className="input" type="date" value={form.date ? form.date.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
+                <div><label className="label">{t.amount} *</label><input className="input" type="number" value={form.amount || ''} onChange={e => setForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
+                <div><label className="label">{t.date}</label><input className="input" type="date" value={form.date ? form.date.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
               </div>
-              <div><label className="label">Category *</label>
+              <div><label className="label">{t.category} *</label>
                 <select className="input" value={form.category || 'other'} onChange={e => setForm((p: any) => ({ ...p, category: e.target.value }))}>
                   {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <div><label className="label">Employee</label>
+              <div><label className="label">{t.employee}</label>
                 <select className="input" value={form.employeeId || ''} onChange={e => setForm((p: any) => ({ ...p, employeeId: e.target.value }))}>
-                  <option value="">None</option>
+                  <option value="">{t.none}</option>
                   {employees.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
                 </select>
               </div>
             </>
           )}
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? '...' : 'Save'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? t.saving : t.save}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={`Delete ${tab.slice(0, -1)}`} message="This cannot be undone." loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={tab === 'invoices' ? t.deleteInvoice : t.deleteExpense} message={tab === 'invoices' ? t.deleteInvoiceMsg : t.deleteExpenseMsg} loading={deleting} />
     </div>
   )
 }

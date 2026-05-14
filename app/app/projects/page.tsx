@@ -63,13 +63,13 @@ export default function ProjectsPage() {
   return (
     <div style={{ padding: '1.5rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, flex: 1 }}>{t.projects || 'Projects'}</h2>
-        <input className="input" placeholder={t.search || 'Search...'} value={search} onChange={e => setSearch(e.target.value)} style={{ width: 200 }} />
-        <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 140 }}>
-          <option value="">All Statuses</option>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, flex: 1 }}>{t['projects.title'] || t.projects}</h2>
+        <input className="input" placeholder={t.search} value={search} onChange={e => setSearch(e.target.value)} style={{ width: 200 }} />
+        <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 160 }}>
+          <option value="">{t.allStatuses}</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        {hasPermission('projects.write') && <button className="btn btn-primary" onClick={openCreate}>+ {t.addProject || 'Add Project'}</button>}
+        {hasPermission('projects.write') && <button className="btn btn-primary" onClick={openCreate}>+ {t.addProject}</button>}
       </div>
 
       {loading ? <LoadingSpinner /> : (
@@ -84,44 +84,44 @@ export default function ProjectsPage() {
                 <StatusBadge status={p.status || 'planning'} />
               </div>
               {p.description && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{p.description.substring(0, 100)}{p.description.length > 100 ? '...' : ''}</p>}
-              {p.dueDate && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Due: {new Date(p.dueDate).toLocaleDateString()}</p>}
+              {p.dueDate && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.due} {new Date(p.dueDate).toLocaleDateString()}</p>}
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                <Link href={`/app/projects/${p._id}/brief`} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8rem' }}>Brief</Link>
-                {hasPermission('projects.write') && <button className="btn btn-secondary" onClick={() => openEdit(p)} style={{ fontSize: '0.8rem' }}>Edit</button>}
-                {hasPermission('projects.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(p)} style={{ fontSize: '0.8rem' }}>Del</button>}
+                <Link href={`/app/projects/${p._id}/brief`} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8rem' }}>{t.brief}</Link>
+                {hasPermission('projects.write') && <button className="btn btn-secondary" onClick={() => openEdit(p)} style={{ fontSize: '0.8rem' }}>{t.edit}</button>}
+                {hasPermission('projects.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(p)} style={{ fontSize: '0.8rem' }}>{t.delete}</button>}
               </div>
             </div>
           ))}
-          {projects.length === 0 && <p style={{ color: 'var(--text-muted)', gridColumn: '1/-1' }}>No projects found</p>}
+          {projects.length === 0 && <p style={{ color: 'var(--text-muted)', gridColumn: '1/-1' }}>{t.noProjects}</p>}
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Project' : 'Add Project'} width={560}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? t.editProject : t.addProject} width={560}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div><label className="label">Name *</label><input className="input" value={form.name || ''} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))} /></div>
-          <div><label className="label">Customer</label>
+          <div><label className="label">{t.name} *</label><input className="input" value={form.name || ''} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))} /></div>
+          <div><label className="label">{t.customer}</label>
             <select className="input" value={form.customerId || ''} onChange={e => setForm((p: any) => ({ ...p, customerId: e.target.value }))}>
-              <option value="">Select customer</option>
+              <option value="">{t.selectCustomer}</option>
               {customers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
-          <div><label className="label">Description</label><textarea className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} rows={3} /></div>
+          <div><label className="label">{t.description}</label><textarea className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} rows={3} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div><label className="label">Status</label>
+            <div><label className="label">{t.status}</label>
               <select className="input" value={form.status || 'planning'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div><label className="label">Due Date</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
+            <div><label className="label">{t.dueDate}</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? '...' : 'Save'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? '...' : t.save}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Project" message={`Delete "${deleteTarget?.name}"?`} loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.deleteProject} message={`"${deleteTarget?.name}"?`} loading={deleting} />
     </div>
   )
 }
