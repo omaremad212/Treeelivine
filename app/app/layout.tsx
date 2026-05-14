@@ -31,6 +31,11 @@ const Icons = {
   LogOut:    () => <Icon d={['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9']} />,
   Search:    () => <Icon d={['M11 19a8 8 0 100-16 8 8 0 000 16z', 'M21 21l-4.35-4.35']} />,
   Menu:      () => <Icon d={['M3 12h18M3 6h18M3 18h18']} />,
+  Headset:   () => <Icon d={['M3 18v-6a9 9 0 0118 0v6', 'M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z', 'M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z']} />,
+  Clipboard: () => <Icon d={['M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2', 'M9 2h6a1 1 0 011 1v3a1 1 0 01-1 1H9a1 1 0 01-1-1V3a1 1 0 011-1z']} />,
+  Receipt:   () => <Icon d={['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6M16 13H8M16 17H8M12 9H8']} />,
+  TrendUp:   () => <Icon d={['M23 6l-9.5 9.5-5-5L1 18', 'M17 6h6v6']} />,
+  Briefcase: () => <Icon d={['M20 7H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z', 'M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2']} />,
 }
 
 /* ── Brand logo SVG ──────────────────────────────────────────────────── */
@@ -51,19 +56,28 @@ const NAV_SECTIONS = [
   {
     label: { ar: 'الرئيسية', en: 'Main' },
     items: [
-      { href: '/app', labelAr: 'اللوحة', labelEn: 'Dashboard', Icon: Icons.Dashboard, perm: null, exact: true },
-      { href: '/app/crm', labelAr: 'العملاء', labelEn: 'CRM', Icon: Icons.Users, perm: 'crm.read' },
-      { href: '/app/projects', labelAr: 'المشاريع', labelEn: 'Projects', Icon: Icons.Folder, perm: 'projects.read' },
-      { href: '/app/tasks', labelAr: 'المهام', labelEn: 'Tasks', Icon: Icons.CheckSq, perm: 'tasks.read' },
-      { href: '/app/finance', labelAr: 'المالية', labelEn: 'Finance', Icon: Icons.Wallet, perm: 'finance.read' },
+      { href: '/app',                  labelAr: 'اللوحة الرئيسية', labelEn: 'Dashboard',        Icon: Icons.Dashboard, perm: null,           exact: true },
+      { href: '/app/projects',         labelAr: 'المشاريع',        labelEn: 'Projects',          Icon: Icons.Folder,    perm: 'projects.read' },
+      { href: '/app/support-tickets',  labelAr: 'طلبات الدعم',     labelEn: 'Support Tickets',   Icon: Icons.Headset,   perm: null },
+      { href: '/app/clients',          labelAr: 'العملاء',         labelEn: 'Clients',           Icon: Icons.Users,     perm: 'crm.read' },
+      { href: '/app/quotations',       labelAr: 'عروض الأسعار',    labelEn: 'Quotations',        Icon: Icons.Clipboard, perm: 'finance.read' },
+      { href: '/app/invoices',         labelAr: 'الفواتير',        labelEn: 'Invoices',          Icon: Icons.Receipt,   perm: 'finance.read' },
     ],
   },
   {
-    label: { ar: 'الإدارة', en: 'Manage' },
+    label: { ar: 'الإدارة', en: 'Management' },
     items: [
-      { href: '/app/team', labelAr: 'الفريق', labelEn: 'Team', Icon: Icons.Building, perm: 'team.read' },
-      { href: '/app/templates', labelAr: 'القوالب', labelEn: 'Templates', Icon: Icons.File, perm: 'templates.read' },
-      { href: '/app/settings', labelAr: 'الإعدادات', labelEn: 'Settings', Icon: Icons.Settings, perm: 'settings.read' },
+      { href: '/app/financial',        labelAr: 'المالية',         labelEn: 'Financial',         Icon: Icons.TrendUp,   perm: 'finance.read' },
+      { href: '/app/hr-payroll',       labelAr: 'الموارد البشرية', labelEn: 'HR & Payroll',      Icon: Icons.Briefcase, perm: 'team.read' },
+      { href: '/app/team',             labelAr: 'الفريق',          labelEn: 'Team',              Icon: Icons.Building,  perm: 'team.read' },
+      { href: '/app/tasks',            labelAr: 'المهام',          labelEn: 'Tasks',             Icon: Icons.CheckSq,   perm: 'tasks.read' },
+    ],
+  },
+  {
+    label: { ar: 'النظام', en: 'System' },
+    items: [
+      { href: '/app/templates',        labelAr: 'القوالب',         labelEn: 'Templates',         Icon: Icons.File,      perm: 'templates.read' },
+      { href: '/app/settings',         labelAr: 'الإعدادات',       labelEn: 'Settings',          Icon: Icons.Settings,  perm: 'settings.read' },
     ],
   },
 ]

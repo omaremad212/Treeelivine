@@ -1,0 +1,218 @@
+'use client'
+import { useState, useEffect } from 'react'
+import { useApp } from '@/contexts/AppContext'
+import StatusBadge from '@/components/ui/StatusBadge'
+import Modal from '@/components/ui/Modal'
+import ConfirmModal from '@/components/ui/ConfirmModal'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+
+const STATUSES  = ['lead', 'prospect', 'active', 'inactive', 'churned']
+const PRIORITIES = ['low', 'medium', 'high', 'urgent']
+
+const IC = ({ d, size = 16 }: { d: string | string[]; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    {(Array.isArray(d) ? d : [d]).map((p, i) => <path key={i} d={p} />)}
+  </svg>
+)
+
+function Stat({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '0.875rem 1.25rem' }}>
+      <p style={{ fontSize: '0.72rem', color: 'var(--fg-4)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 500, marginBottom: '0.3rem' }}>{label}</p>
+      <p style={{ fontSize: '1.5rem', fontWeight: 700, color }}>{value}</p>
+    </div>
+  )
+}
+
+export default function ClientsPage() {
+  const { hasPermission, settings } = useApp()
+  const [customers, setCustomers] = useState<any[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [search, setSearch]       = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing]     = useState<any>(null)
+  const [deleteTarget, setDeleteTarget] = useState<any>(null)
+  const [deleting, setDeleting]   = useState(false)
+  const [form, setForm]           = useState<any>({})
+  const [saving, setSaving]       = useState(false)
+  const [error, setError]         = useState('')
+
+  async function fetchCustomers() {
+    setLoading(true)
+    const params = new URLSearchParams()
+    if (search)       params.set('search', search)
+    if (filterStatus) params.set('status', filterStatus)
+    const res  = await fetch(`/api/customers?${params}`)
+    const data = await res.json()
+    if (data.success) setCustomers(data.data)
+    setLoading(false)
+  }
+
+  useEffect(() => { fetchCustomers() }, [search, filterStatus])
+
+  function openCreate() { setForm({ status: 'lead', priority: 'medium' }); setEditing(null); setError(''); setModalOpen(true) }
+  function openEdit(c: any) { setForm({ ...c }); setEditing(c); setError(''); setModalOpen(true) }
+
+  async function handleSave() {
+    setSaving(true); setError('')
+    const url    = editing ? `/api/customers/${editing._id}` : '/api/customers'
+    const method = editing ? 'PUT' : 'POST'
+    const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    const data   = await res.json()
+    if (!data.success) { setError(data.message || 'Error'); setSaving(false); return }
+    setModalOpen(false); fetchCustomers()
+    setSaving(false)
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    await fetch(`/api/customers/${deleteTarget._id}`, { method: 'DELETE' })
+    setDeleteTarget(null); setDeleting(false); fetchCustomers()
+  }
+
+  const counts = {
+    total:    customers.length,
+    active:   customers.filter(c => c.status === 'active').length,
+    leads:    customers.filter(c => c.status === 'lead' || c.status === 'prospect').length,
+    highPrio: customers.filter(c => c.priority === 'high' || c.priority === 'urgent').length,
+  }
+
+  return (
+    <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>Clients</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Manage your customers and CRM pipeline</p>
+        </div>
+        {hasPermission('crm.write') && (
+          <button className="btn btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <IC d="M12 5v14M5 12h14" /> Add Client
+          </button>
+        )}
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
+        <Stat label="Total Clients" value={counts.total}    color="var(--fg-1)" />
+        <Stat label="Active"        value={counts.active}   color="#059669" />
+        <Stat label="Leads"         value={counts.leads}    color="#2563eb" />
+        <Stat label="High Priority" value={counts.highPrio} color="#dc2626" />
+      </div>
+
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <input
+          className="input" placeholder="Search clients…" value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 220 }}
+        />
+        <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 150 }}>
+          <option value="">All Statuses</option>
+          {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+        </select>
+      </div>
+
+      {/* Table */}
+      {loading ? <LoadingSpinner /> : (
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
+                {['Client', 'Company', 'Contact', 'Status', 'Priority', 'Actions'].map(h => (
+                  <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {customers.map(c => (
+                <tr key={c._id} style={{ borderBottom: '1px solid var(--border)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                  <td style={{ padding: '0.875rem 1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>
+                        {(c.name || '?')[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--fg-1)' }}>{c.name}</p>
+                        {c.notes && <p style={{ fontSize: '0.72rem', color: 'var(--fg-4)' }}>{c.notes.substring(0, 40)}</p>}
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '0.875rem 1rem', color: 'var(--fg-3)', fontSize: '0.875rem' }}>{c.company || '—'}</td>
+                  <td style={{ padding: '0.875rem 1rem' }}>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--fg-3)' }}>{c.email || '—'}</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-4)' }}>{c.phone || ''}</p>
+                  </td>
+                  <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status || 'lead'} /></td>
+                  <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.priority || 'medium'} /></td>
+                  <td style={{ padding: '0.875rem 1rem' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      {hasPermission('crm.write') && (
+                        <button className="btn btn-secondary" onClick={() => openEdit(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Edit</button>
+                      )}
+                      {hasPermission('crm.write') && (
+                        <button className="btn btn-danger" onClick={() => setDeleteTarget(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Delete</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {customers.length === 0 && (
+                <tr><td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--fg-4)' }}>
+                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>No clients found</p>
+                  <p style={{ fontSize: '0.8rem' }}>Add your first client to get started</p>
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Create / Edit Modal */}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Client' : 'Add New Client'} width={540}>
+        {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem', background: 'var(--danger)11', borderRadius: 6 }}>{error}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+            <div><label className="label">Full Name *</label><input className="input" value={form.name || ''} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))} placeholder="Ahmed Al-Malki" /></div>
+            <div><label className="label">Company</label><input className="input" value={form.company || ''} onChange={e => setForm((p: any) => ({ ...p, company: e.target.value }))} placeholder="Company Name" /></div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+            <div><label className="label">Email</label><input className="input" type="email" value={form.email || ''} onChange={e => setForm((p: any) => ({ ...p, email: e.target.value }))} placeholder="email@company.com" /></div>
+            <div><label className="label">Phone</label><input className="input" value={form.phone || ''} onChange={e => setForm((p: any) => ({ ...p, phone: e.target.value }))} placeholder="+966 50 000 0000" /></div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+            <div>
+              <label className="label">Status</label>
+              <select className="input" value={form.status || 'lead'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
+                {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label">Priority</label>
+              <select className="input" value={form.priority || 'medium'} onChange={e => setForm((p: any) => ({ ...p, priority: e.target.value }))}>
+                {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+              </select>
+            </div>
+          </div>
+          <div><label className="label">Notes</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={3} placeholder="Any additional notes about this client…" /></div>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Add Client'}</button>
+          </div>
+        </div>
+      </Modal>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete Client"
+        message={`Delete "${deleteTarget?.name}"? All associated data may be affected.`}
+        loading={deleting}
+      />
+    </div>
+  )
+}
