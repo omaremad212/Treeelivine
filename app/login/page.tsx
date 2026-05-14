@@ -96,17 +96,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
+    <div className="login-grid" style={{
       height: '100vh',
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
       background: 'var(--bg-app)',
     }}>
       {/* ── Left panel: form ─────────────────────────────────── */}
-      <div style={{
+      <div className="login-form-panel" style={{
         display: 'flex',
         flexDirection: 'column',
-        padding: 'var(--space-8) clamp(32px, 7vw, 72px)',
+        padding: 'var(--space-8) clamp(24px, 7vw, 72px)',
         justifyContent: 'center',
         background: 'var(--bg-surface)',
         borderInlineEnd: '1px solid var(--border-1)',
@@ -215,7 +215,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel: branded olive-green ─────────────────── */}
-      <div style={{
+      <div className="login-brand-panel" style={{
         background: 'var(--brand-olive-600)',
         color: 'white',
         display: 'flex',
@@ -264,15 +264,11 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Responsive: hide right panel on small screens ──── */}
       <style>{`
         @media (max-width: 768px) {
-          div[style*="gridTemplateColumns"] {
-            grid-template-columns: 1fr !important;
-          }
-          div[style*="background: var(--brand-olive-600)"] {
-            display: none !important;
-          }
+          .login-grid { grid-template-columns: 1fr !important; }
+          .login-brand-panel { display: none !important; }
+          .login-form-panel { padding: 2rem 1.5rem !important; justify-content: flex-start !important; padding-top: 3rem !important; overflow-y: auto; }
         }
       `}</style>
     </div>
