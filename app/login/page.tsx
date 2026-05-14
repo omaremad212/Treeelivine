@@ -2,7 +2,6 @@
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '@/contexts/AppContext'
-import Link from 'next/link'
 
 /* ── Brand logo ──────────────────────────────────────────────────────── */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -183,13 +182,6 @@ export default function LoginPage() {
               ? (isAr ? 'جارٍ إعداد الديمو…' : 'Setting up demo…')
               : (isAr ? '🚀 جرّب الديمو' : '🚀 Try Demo')}
           </button>
-
-          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--fg-4)', textAlign: 'center' }}>
-            {isAr ? 'مستخدم جديد؟ ' : 'New here? '}
-            <Link href="/register" style={{ color: 'var(--fg-link)', fontWeight: 'var(--fw-medium)' }}>
-              {isAr ? 'أنشئ حسابك' : 'Create an account'}
-            </Link>
-          </p>
         </form>
 
         {/* Bottom bar */}

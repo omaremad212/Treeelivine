@@ -233,7 +233,7 @@ export default function LandingPage() {
     navModules:   isAr ? 'الوحدات'    : 'Modules',
     navPricing:   isAr ? 'الأسعار'    : 'Pricing',
     navLogin:     isAr ? 'دخول'       : 'Sign In',
-    navRegister:  isAr ? 'حساب جديد'  : 'New Account',
+    navRegister:  '',
     navDemo:      isAr ? 'جرّب الديمو' : 'Try Demo',
     // Hero
     trustBadge:   isAr ? 'موثوق من مئات الوكالات' : 'Trusted by hundreds of agencies',
@@ -476,7 +476,6 @@ export default function LandingPage() {
             {isDark ? '☀️' : '🌙'}
           </button>
           <Link href="/login" className="ln-link nav-hide-mobile" style={{ display: 'inline-block' }}>{lp.navLogin}</Link>
-          <Link href="/register" className="btn-secondary btn-sm nav-hide-mobile">{lp.navRegister}</Link>
           <button onClick={handleDemo} disabled={demoLoading} className="btn-primary btn-sm" style={{ opacity: demoLoading ? 0.75 : 1 }}>
             {demoLoading ? '...' : lp.navDemo}
           </button>
@@ -526,7 +525,7 @@ export default function LandingPage() {
             <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1, fontSize: 16, padding: '14px 30px' }}>
               {demoLoading ? lp.heroLoading : lp.heroCta1}
             </button>
-            <Link href="/register" className="btn-secondary" style={{ fontSize: 16, padding: '14px 28px' }}>{lp.heroCta2}</Link>
+            <Link href="/login" className="btn-secondary" style={{ fontSize: 16, padding: '14px 28px' }}>{lp.navLogin}</Link>
           </div>
           <p style={{ fontSize: 12, color: L.fg5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, animation: 'wordIn 0.7s ease 0.85s both' }}>
             <span style={{ color: '#2f8a3e', fontWeight: 700 }}>✓</span>
@@ -651,7 +650,6 @@ export default function LandingPage() {
                 <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1 }}>
                   {demoLoading ? lp.demoLoadingTxt : lp.demoCta1}
                 </button>
-                <Link href="/register" className="btn-secondary">{lp.demoCta2}</Link>
               </div>
             </div>
             <div style={{ background: L.bg, border: `1px solid ${L.border}`, borderRadius: 12, padding: 20, position: 'relative' }}>
@@ -764,8 +762,8 @@ export default function LandingPage() {
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'}>
               {demoLoading ? '...' : lp.finalCta1}
             </button>
-            <Link href="/register" style={{ display: 'inline-flex', alignItems: 'center', padding: '14px 28px', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid rgba(255,255,255,0.3)', textDecoration: 'none' }}>
-              {lp.finalCta2}
+            <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', padding: '14px 28px', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid rgba(255,255,255,0.3)', textDecoration: 'none' }}>
+              {lp.navLogin}
             </Link>
           </div>
         </div>
@@ -784,7 +782,7 @@ export default function LandingPage() {
             </div>
             {[
               { title: lp.footerProduct, links: [{ l: lp.navFeatures, h: '#features' }, { l: lp.navModules, h: '#modules' }, { l: lp.navPricing, h: '#pricing' }, { l: 'FAQ', h: '#faq' }] },
-              { title: lp.footerAccount, links: [{ l: lp.footerLogin, h: '/login' }, { l: lp.footerRegister, h: '/register' }, { l: lp.footerDemo, h: '#pricing' }] },
+              { title: lp.footerAccount, links: [{ l: lp.footerLogin, h: '/login' }, { l: lp.footerDemo, h: '#pricing' }] },
               { title: lp.footerSupport, links: [{ l: lp.footerPrivacy, h: '/privacy' }, { l: lp.footerTerms, h: '/terms' }, { l: lp.footerSupport2, h: '/support' }] },
             ].map((col, i) => (
               <div key={i}>
