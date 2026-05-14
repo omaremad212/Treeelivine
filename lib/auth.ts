@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
-import { connectDB } from './mongodb'
-import User from '@/models/User'
-import Setting from '@/models/Setting'
+import { supabase } from './supabase'
 import { NextRequest } from 'next/server'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'treeelivine-secret-dev'
@@ -24,7 +22,7 @@ export function getPermissionsForRole(role: string, settings: any): string[] {
 export function getEffectivePermissions(user: any, settings: any): string[] {
   let perms = getPermissionsForRole(user.role, settings)
   const override = (settings?.userPermissionOverrides || []).find(
-    (o: any) => o.userId?.toString() === user._id?.toString()
+    (o: any) => o.userId === user.id
   )
   if (override) {
     const merged = perms.concat(override.permissions || [])
@@ -46,13 +44,34 @@ export async function getAuthUser(req?: NextRequest) {
     if (!token) return null
 
     const decoded = verifyToken(token)
-    await connectDB()
-    const user = await User.findById(decoded.userId) as any
-    if (!user || !user.isActive) return null
 
-    const settings = await Setting.findOne()
-    user.effectivePermissions = getEffectivePermissions(user, settings)
-    return user
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', decoded.userId)
+      .single()
+
+    if (!user || !user.is_active) return null
+
+    const { data: settingsRow } = await supabase.from('settings').select('*').limit(1).single()
+    const settings = settingsRow ? {
+      roles: settingsRow.roles,
+      permissions: settingsRow.permissions,
+      userPermissionOverrides: settingsRow.user_permission_overrides || [],
+    } : {}
+
+    // Build camelCase user object with MongoDB compat
+    const userObj = {
+      _id: user.id,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isActive: user.is_active,
+      isDemo: user.is_demo,
+      effectivePermissions: getEffectivePermissions(user, settings),
+    }
+    return userObj
   } catch {
     return null
   }
