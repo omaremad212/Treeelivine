@@ -446,7 +446,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── Dashboard with perspective tilt ── */}
-        <div style={{ marginTop: 44, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
+        <div style={{ marginTop: 16, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
           {/* Bottom fade mask */}
           <div style={{ position: 'absolute', bottom: 0, insetInline: 0, height: '20%', background: `linear-gradient(to top, var(--bg-app), transparent)`, zIndex: 2, pointerEvents: 'none' }} />
 
