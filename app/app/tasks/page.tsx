@@ -43,7 +43,7 @@ export default function TasksPage() {
   useEffect(() => { fetchTasks() }, [filterStatus])
 
   function openCreate() { setForm({ status: 'pending', priority: 'medium' }); setEditing(null); setModalOpen(true) }
-  function openEdit(t: any) { setForm({ ...t, projectId: t.projectId?._id || t.projectId, currentAssigneeId: t.currentAssigneeId?._id || t.currentAssigneeId }); setEditing(t); setModalOpen(true) }
+  function openEdit(task: any) { setForm({ ...task, projectId: task.projectId?._id || task.projectId, currentAssigneeId: task.currentAssigneeId?._id || task.currentAssigneeId }); setEditing(task); setModalOpen(true) }
 
   async function handleSave() {
     setSaving(true)
@@ -74,12 +74,12 @@ export default function TasksPage() {
   return (
     <div style={{ padding: '1.5rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, flex: 1 }}>{t.tasks || 'Tasks'}</h2>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, flex: 1 }}>{t['tasks.title'] || t.tasks}</h2>
         <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 160 }}>
-          <option value="">All Statuses</option>
+          <option value="">{t.allStatuses}</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        {hasPermission('tasks.write') && <button className="btn btn-primary" onClick={openCreate}>+ {t.addTask || 'Add Task'}</button>}
+        {hasPermission('tasks.write') && <button className="btn btn-primary" onClick={openCreate}>+ {t.addTask}</button>}
       </div>
 
       {loading ? <LoadingSpinner /> : (
@@ -87,7 +87,7 @@ export default function TasksPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                {['Title', 'Project', 'Assignee', 'Priority', 'Status', 'Due', 'Actions'].map(h => (
+                {[t.taskTitle, t.taskProject, t.taskAssignee, t.taskPriority, t.taskStatus, t.taskDue, t.taskActions].map(h => (
                   <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
@@ -109,70 +109,70 @@ export default function TasksPage() {
                   </td>
                   <td style={{ padding: '0.75rem 1rem' }}>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
-                      {hasPermission('tasks.write') && <button className="btn btn-secondary" onClick={() => openEdit(task)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>Edit</button>}
-                      {hasPermission('tasks.write') && <button className="btn btn-secondary" onClick={() => { setHandoverModal(task); setNewAssignee('') }} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>Handover</button>}
-                      {hasPermission('tasks.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(task)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>Del</button>}
+                      {hasPermission('tasks.write') && <button className="btn btn-secondary" onClick={() => openEdit(task)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>{t.edit}</button>}
+                      {hasPermission('tasks.write') && <button className="btn btn-secondary" onClick={() => { setHandoverModal(task); setNewAssignee('') }} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>{t.handover}</button>}
+                      {hasPermission('tasks.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(task)} style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}>{t.delete}</button>}
                     </div>
                   </td>
                 </tr>
               ))}
-              {tasks.length === 0 && <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No tasks found</td></tr>}
+              {tasks.length === 0 && <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t.noTasks}</td></tr>}
             </tbody>
           </table>
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Task' : 'Add Task'} width={560}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? t.editTask : t.addTask} width={560}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div><label className="label">Title *</label><input className="input" value={form.title || ''} onChange={e => setForm((p: any) => ({ ...p, title: e.target.value }))} /></div>
-          <div><label className="label">Project</label>
+          <div><label className="label">{t.name} *</label><input className="input" value={form.title || ''} onChange={e => setForm((p: any) => ({ ...p, title: e.target.value }))} /></div>
+          <div><label className="label">{t['tasks.taskProject'] || t.project}</label>
             <select className="input" value={form.projectId || ''} onChange={e => setForm((p: any) => ({ ...p, projectId: e.target.value }))}>
-              <option value="">No project</option>
+              <option value="">{t.noProject}</option>
               {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
             </select>
           </div>
-          <div><label className="label">Assignee</label>
+          <div><label className="label">{t.assignee}</label>
             <select className="input" value={form.currentAssigneeId || ''} onChange={e => setForm((p: any) => ({ ...p, currentAssigneeId: e.target.value }))}>
-              <option value="">Unassigned</option>
+              <option value="">{t['tasks.unassigned'] || t.unassigned}</option>
               {employees.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
             </select>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-            <div><label className="label">Status</label>
+            <div><label className="label">{t.status}</label>
               <select className="input" value={form.status || 'pending'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                 {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div><label className="label">Priority</label>
+            <div><label className="label">{t.priority}</label>
               <select className="input" value={form.priority || 'medium'} onChange={e => setForm((p: any) => ({ ...p, priority: e.target.value }))}>
                 {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
-            <div><label className="label">Due Date</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
+            <div><label className="label">{t.dueDate}</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
           </div>
-          <div><label className="label">Description</label><textarea className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} rows={3} /></div>
+          <div><label className="label">{t.description}</label><textarea className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} rows={3} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? '...' : 'Save'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? '...' : t.save}</button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!handoverModal} onClose={() => setHandoverModal(null)} title="Handover Task" width={380}>
+      <Modal open={!!handoverModal} onClose={() => setHandoverModal(null)} title={t.handoverTask} width={380}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Assign "{handoverModal?.title}" to:</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t.assignTo} "{handoverModal?.title}"</p>
           <select className="input" value={newAssignee} onChange={e => setNewAssignee(e.target.value)}>
-            <option value="">Select employee</option>
+            <option value="">{t.selectEmployee}</option>
             {employees.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
           </select>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setHandoverModal(null)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleHandover} disabled={!newAssignee}>Handover</button>
+            <button className="btn btn-secondary" onClick={() => setHandoverModal(null)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleHandover} disabled={!newAssignee}>{t.handover}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Task" message={`Delete "${deleteTarget?.title}"?`} loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.deleteTask} message={`"${deleteTarget?.title}"?`} loading={deleting} />
     </div>
   )
 }

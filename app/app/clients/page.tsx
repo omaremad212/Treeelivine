@@ -25,7 +25,7 @@ function Stat({ label, value, color }: { label: string; value: number; color: st
 }
 
 export default function ClientsPage() {
-  const { hasPermission, settings } = useApp()
+  const { t, hasPermission } = useApp()
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
@@ -60,7 +60,7 @@ export default function ClientsPage() {
     const method = editing ? 'PUT' : 'POST'
     const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     const data   = await res.json()
-    if (!data.success) { setError(data.message || 'Error'); setSaving(false); return }
+    if (!data.success) { setError(data.message || t.error); setSaving(false); return }
     setModalOpen(false); fetchCustomers()
     setSaving(false)
   }
@@ -80,47 +80,39 @@ export default function ClientsPage() {
 
   return (
     <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>Clients</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Manage your customers and CRM pipeline</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.clients}</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.clientsSubtitle}</p>
         </div>
         {hasPermission('crm.write') && (
           <button className="btn btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IC d="M12 5v14M5 12h14" /> Add Client
+            <IC d="M12 5v14M5 12h14" /> {t.addClient}
           </button>
         )}
       </div>
 
-      {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
-        <Stat label="Total Clients" value={counts.total}    color="var(--fg-1)" />
-        <Stat label="Active"        value={counts.active}   color="#059669" />
-        <Stat label="Leads"         value={counts.leads}    color="#2563eb" />
-        <Stat label="High Priority" value={counts.highPrio} color="#dc2626" />
+        <Stat label={t.totalClients} value={counts.total}    color="var(--fg-1)" />
+        <Stat label={t.active}       value={counts.active}   color="#059669" />
+        <Stat label={t.leads}        value={counts.leads}    color="#2563eb" />
+        <Stat label={t.highPriority} value={counts.highPrio} color="#dc2626" />
       </div>
 
-      {/* Filters */}
       <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        <input
-          className="input" placeholder="Search clients…" value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 220 }}
-        />
+        <input className="input" placeholder={t.searchClients} value={search} onChange={e => setSearch(e.target.value)} style={{ width: 220 }} />
         <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 150 }}>
-          <option value="">All Statuses</option>
+          <option value="">{t.allStatuses}</option>
           {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
         </select>
       </div>
 
-      {/* Table */}
       {loading ? <LoadingSpinner /> : (
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                {['Client', 'Company', 'Contact', 'Status', 'Priority', 'Actions'].map(h => (
+                {[t.clients, t.company, t.email, t.status, t.priority, t.actions].map(h => (
                   <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                 ))}
               </tr>
@@ -151,10 +143,10 @@ export default function ClientsPage() {
                   <td style={{ padding: '0.875rem 1rem' }}>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
                       {hasPermission('crm.write') && (
-                        <button className="btn btn-secondary" onClick={() => openEdit(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Edit</button>
+                        <button className="btn btn-secondary" onClick={() => openEdit(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.edit}</button>
                       )}
                       {hasPermission('crm.write') && (
-                        <button className="btn btn-danger" onClick={() => setDeleteTarget(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Delete</button>
+                        <button className="btn btn-danger" onClick={() => setDeleteTarget(c)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.delete}</button>
                       )}
                     </div>
                   </td>
@@ -162,8 +154,8 @@ export default function ClientsPage() {
               ))}
               {customers.length === 0 && (
                 <tr><td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--fg-4)' }}>
-                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>No clients found</p>
-                  <p style={{ fontSize: '0.8rem' }}>Add your first client to get started</p>
+                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{t.noClients}</p>
+                  <p style={{ fontSize: '0.8rem' }}>{t.addFirstClient}</p>
                 </td></tr>
               )}
             </tbody>
@@ -171,36 +163,35 @@ export default function ClientsPage() {
         </div>
       )}
 
-      {/* Create / Edit Modal */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Client' : 'Add New Client'} width={540}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? t.editClient : t.addNewClient} width={540}>
         {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem', background: 'var(--danger)11', borderRadius: 6 }}>{error}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Full Name *</label><input className="input" value={form.name || ''} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))} placeholder="Ahmed Al-Malki" /></div>
-            <div><label className="label">Company</label><input className="input" value={form.company || ''} onChange={e => setForm((p: any) => ({ ...p, company: e.target.value }))} placeholder="Company Name" /></div>
+            <div><label className="label">{t.fullName} *</label><input className="input" value={form.name || ''} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))} /></div>
+            <div><label className="label">{t.company}</label><input className="input" value={form.company || ''} onChange={e => setForm((p: any) => ({ ...p, company: e.target.value }))} /></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Email</label><input className="input" type="email" value={form.email || ''} onChange={e => setForm((p: any) => ({ ...p, email: e.target.value }))} placeholder="email@company.com" /></div>
-            <div><label className="label">Phone</label><input className="input" value={form.phone || ''} onChange={e => setForm((p: any) => ({ ...p, phone: e.target.value }))} placeholder="+966 50 000 0000" /></div>
+            <div><label className="label">{t.email}</label><input className="input" type="email" value={form.email || ''} onChange={e => setForm((p: any) => ({ ...p, email: e.target.value }))} /></div>
+            <div><label className="label">{t.phone}</label><input className="input" value={form.phone || ''} onChange={e => setForm((p: any) => ({ ...p, phone: e.target.value }))} /></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
             <div>
-              <label className="label">Status</label>
+              <label className="label">{t.status}</label>
               <select className="input" value={form.status || 'lead'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                 {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
               </select>
             </div>
             <div>
-              <label className="label">Priority</label>
+              <label className="label">{t.priority}</label>
               <select className="input" value={form.priority || 'medium'} onChange={e => setForm((p: any) => ({ ...p, priority: e.target.value }))}>
                 {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
               </select>
             </div>
           </div>
-          <div><label className="label">Notes</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={3} placeholder="Any additional notes about this client…" /></div>
+          <div><label className="label">{t.notes}</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={3} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Add Client'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? t.saving : editing ? t.saveChanges : t.addClient}</button>
           </div>
         </div>
       </Modal>
@@ -209,8 +200,8 @@ export default function ClientsPage() {
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Client"
-        message={`Delete "${deleteTarget?.name}"? All associated data may be affected.`}
+        title={t.deleteClient}
+        message={`"${deleteTarget?.name}" — ${t.deleteClientMsg}`}
         loading={deleting}
       />
     </div>

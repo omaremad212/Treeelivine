@@ -28,7 +28,7 @@ function OverviewCard({ label, value, icon, color, sub }: { label: string; value
 }
 
 export default function FinancialPage() {
-  const { hasPermission, settings } = useApp()
+  const { t, hasPermission, settings } = useApp()
   const cur = settings?.defaultCurrency || 'SAR'
 
   const [invoices,  setInvoices]  = useState<any[]>([])
@@ -92,12 +92,12 @@ export default function FinancialPage() {
     <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>Financial Overview</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Company revenue, expenses, and profitability</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.financialTitle}</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.financialSubtitle}</p>
         </div>
         {hasPermission('finance.write') && (
           <button className="btn btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IC d="M12 5v14M5 12h14" /> Log Expense
+            <IC d="M12 5v14M5 12h14" /> {t.logExpense}
           </button>
         )}
       </div>
@@ -106,18 +106,18 @@ export default function FinancialPage() {
         <>
           {/* Overview cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
-            <OverviewCard label="Total Revenue"    value={`${cur} ${totalRevenue.toLocaleString()}`}  icon={<IC d="M23 6l-9.5 9.5-5-5L1 18 M17 6h6v6" />}    color="#4f6831" sub="Collected invoices" />
-            <OverviewCard label="Pending Revenue"  value={`${cur} ${totalPending.toLocaleString()}`}  icon={<IC d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />} color="#d97706" sub="Unpaid invoices" />
-            <OverviewCard label="Total Expenses"   value={`${cur} ${totalExpenses.toLocaleString()}`} icon={<IC d="M2 16.1A5 5 0 015.9 20M2 12.05A9 9 0 019.95 20M2 8V6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2h-6" />} color="#ef4444" />
-            <OverviewCard label="Net Profit"       value={`${cur} ${netProfit.toLocaleString()}`}     icon={<IC d="M22 7l-8.5 8.5-5-5L2 17M16 7h6v6" />}      color={netProfit >= 0 ? '#059669' : '#dc2626'} sub={totalRevenue > 0 ? `${((netProfit / totalRevenue) * 100).toFixed(1)}% margin` : undefined} />
+            <OverviewCard label={t.totalRevenue}   value={`${cur} ${totalRevenue.toLocaleString()}`}  icon={<IC d="M23 6l-9.5 9.5-5-5L1 18 M17 6h6v6" />}    color="#4f6831" sub={t.collectedInvoices} />
+            <OverviewCard label={t.pendingRevenue} value={`${cur} ${totalPending.toLocaleString()}`}  icon={<IC d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />} color="#d97706" sub={t.unpaidInvoices} />
+            <OverviewCard label={t.totalExpenses}  value={`${cur} ${totalExpenses.toLocaleString()}`} icon={<IC d="M2 16.1A5 5 0 015.9 20M2 12.05A9 9 0 019.95 20M2 8V6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2h-6" />} color="#ef4444" />
+            <OverviewCard label={t.netProfit}      value={`${cur} ${netProfit.toLocaleString()}`}     icon={<IC d="M22 7l-8.5 8.5-5-5L2 17M16 7h6v6" />}      color={netProfit >= 0 ? '#059669' : '#dc2626'} sub={totalRevenue > 0 ? `${((netProfit / totalRevenue) * 100).toFixed(1)}% ${t.marginPct}` : undefined} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.25rem', marginBottom: '1.5rem' }}>
             {/* Expense breakdown */}
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
-              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem' }}>Expenses by Category</h3>
+              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)', marginBottom: '1rem' }}>{t.expensesByCategory}</h3>
               {catTotals.length === 0 ? (
-                <p style={{ color: 'var(--fg-4)', fontSize: '0.875rem' }}>No expenses recorded yet</p>
+                <p style={{ color: 'var(--fg-4)', fontSize: '0.875rem' }}>{t.noExpensesYet}</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {catTotals.map(({ cat, total }) => {
@@ -141,11 +141,11 @@ export default function FinancialPage() {
             {/* Quick stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {[
-                { label: 'Total Invoices',     value: String(invoices.length),                                            color: 'var(--fg-1)' },
-                { label: 'Paid Invoices',      value: String(invoices.filter(i => i.status === 'paid').length),           color: '#059669' },
-                { label: 'Overdue',            value: String(invoices.filter(i => i.status === 'overdue').length),        color: '#dc2626' },
-                { label: 'Total Expense Items', value: String(expenses.length),                                           color: 'var(--fg-1)' },
-                { label: 'Salary Expenses',    value: `${cur} ${expenses.filter(e=>e.category==='salary').reduce((s,e)=>s+(e.amount||0),0).toLocaleString()}`, color: '#7c3aed' },
+                { label: t.totalInvoices,       value: String(invoices.length),                                            color: 'var(--fg-1)' },
+                { label: t.paidInvoices,        value: String(invoices.filter(i => i.status === 'paid').length),           color: '#059669' },
+                { label: t.overdue,             value: String(invoices.filter(i => i.status === 'overdue').length),        color: '#dc2626' },
+                { label: t.totalExpenseItems,   value: String(expenses.length),                                            color: 'var(--fg-1)' },
+                { label: t.salaryExpenses,      value: `${cur} ${expenses.filter(e=>e.category==='salary').reduce((s,e)=>s+(e.amount||0),0).toLocaleString()}`, color: '#7c3aed' },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '0.75rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--fg-3)' }}>{s.label}</span>
@@ -158,16 +158,16 @@ export default function FinancialPage() {
           {/* Expenses table */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)' }}>
-              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)' }}>Expense Log</h3>
+              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.expenseLog}</h3>
               <select className="input" value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ width: 160, fontSize: '0.8rem' }}>
-                <option value="">All Categories</option>
+                <option value="">{t.allCategories}</option>
                 {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
               </select>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                  {['Description', 'Category', 'Amount', 'Date', 'Actions'].map(h => (
+                  {[t.description, t.category, t.amount, t.date, t.actions].map(h => (
                     <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                   ))}
                 </tr>
@@ -183,15 +183,15 @@ export default function FinancialPage() {
                     <td style={{ padding: '0.875rem 1rem', fontSize: '0.82rem', color: 'var(--fg-4)' }}>{exp.date ? new Date(exp.date).toLocaleDateString() : '—'}</td>
                     <td style={{ padding: '0.875rem 1rem' }}>
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(exp)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Edit</button>}
-                        {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(exp)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Delete</button>}
+                        {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(exp)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.edit}</button>}
+                        {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(exp)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.delete}</button>}
                       </div>
                     </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr><td colSpan={5} style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--fg-4)' }}>
-                    <p style={{ fontWeight: 500 }}>No expenses found</p>
+                    <p style={{ fontWeight: 500 }}>{t.noExpenses}</p>
                   </td></tr>
                 )}
               </tbody>
@@ -200,34 +200,34 @@ export default function FinancialPage() {
         </>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Expense' : 'Log Expense'} width={480}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? t.editExpense : t.logExpense} width={480}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div><label className="label">Description</label><input className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} placeholder="e.g. Adobe Creative Cloud" /></div>
+          <div><label className="label">{t.description}</label><input className="input" value={form.description || ''} onChange={e => setForm((p: any) => ({ ...p, description: e.target.value }))} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-            <div><label className="label">Amount *</label><input className="input" type="number" value={form.amount || ''} onChange={e => setForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
-            <div><label className="label">Date</label><input className="input" type="date" value={form.date ? form.date.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
+            <div><label className="label">{t.amount} *</label><input className="input" type="number" value={form.amount || ''} onChange={e => setForm((p: any) => ({ ...p, amount: Number(e.target.value) }))} /></div>
+            <div><label className="label">{t.date}</label><input className="input" type="date" value={form.date ? form.date.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, date: e.target.value }))} /></div>
           </div>
           <div>
-            <label className="label">Category *</label>
+            <label className="label">{t.category} *</label>
             <select className="input" value={form.category || 'other'} onChange={e => setForm((p: any) => ({ ...p, category: e.target.value }))}>
               {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
           <div>
-            <label className="label">Employee (for salary)</label>
+            <label className="label">{t.employeeForSalary}</label>
             <select className="input" value={form.employeeId || ''} onChange={e => setForm((p: any) => ({ ...p, employeeId: e.target.value }))}>
-              <option value="">None</option>
+              <option value="">{t.none}</option>
               {employees.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
             </select>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Log Expense'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? t.saving : editing ? t.saveChanges : t.logExpense}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Expense" message="Delete this expense record? This cannot be undone." loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.deleteExpense} message={t.deleteExpenseMsg} loading={deleting} />
     </div>
   )
 }
