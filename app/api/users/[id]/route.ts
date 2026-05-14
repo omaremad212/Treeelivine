@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
+import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { toApi } from '@/lib/utils'
 import bcrypt from 'bcryptjs'
@@ -21,6 +21,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!user) return unauthorizedResponse()
   const isSelf = user.id === params.id
   if (!isSelf && !hasPermission(user, 'settings.write')) return forbiddenResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const { password, role, effectivePermissions, name, email, isActive } = await req.json()
   const updates: any = {}
@@ -47,6 +48,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'settings.write')) return forbiddenResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const { error } = await supabase.from('users').delete().eq('id', params.id)
   if (error) return Response.json({ success: false, message: error.message }, { status: 500 })

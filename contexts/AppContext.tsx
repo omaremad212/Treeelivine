@@ -117,6 +117,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const hasPermission = useCallback((perm: string) => {
     if (!user) return false
+    if (user.isDemo && perm.endsWith('.write')) return false
     if (user.role === 'admin') return true
     return (user.effectivePermissions || []).includes(perm)
   }, [user])

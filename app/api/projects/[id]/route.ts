@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
+import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { toApi } from '@/lib/utils'
 
@@ -21,6 +21,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'projects.write')) return forbiddenResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const body = await req.json()
   const updates: any = {}
@@ -51,6 +52,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'projects.write')) return forbiddenResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   await supabase.from('tasks').delete().eq('project_id', params.id)
   const { error } = await supabase.from('projects').delete().eq('id', params.id)

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
+import { getAuthUser, unauthorizedResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { toApi } from '@/lib/utils'
 
@@ -16,6 +16,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const { customerId, projectId, status, currency, items, taxRate, validUntil, notes } = await req.json()
 
@@ -46,6 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
   await supabase.from('quotations').delete().eq('id', params.id)
   return Response.json({ success: true })
 }

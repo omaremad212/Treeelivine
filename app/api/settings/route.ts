@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse } from '@/lib/auth'
+import { getAuthUser, hasPermission, unauthorizedResponse, forbiddenResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 
 async function getOrCreateSettings() {
@@ -39,6 +39,7 @@ export async function PUT(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
   if (!hasPermission(user, 'settings.write')) return forbiddenResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const body = await req.json()
   const settings = await getOrCreateSettings()

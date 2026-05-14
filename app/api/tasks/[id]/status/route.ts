@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server'
-import { getAuthUser, unauthorizedResponse } from '@/lib/auth'
+import { getAuthUser, unauthorizedResponse, demoReadOnlyResponse } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { toApi } from '@/lib/utils'
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
   if (!user) return unauthorizedResponse()
+  if (user.isDemo) return demoReadOnlyResponse()
 
   const { status } = await req.json()
   const validStatuses = ['pending', 'in_progress', 'in_review', 'completed', 'cancelled']
