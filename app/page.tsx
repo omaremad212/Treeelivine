@@ -135,6 +135,17 @@ export default function LandingPage() {
   const [carouselIdx, setCarouselIdx] = useState(0)
   const [demoLoading, setDemoLoading] = useState(false)
   const [navScrolled, setNavScrolled] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 640
+      setIsMobile(prev => { if (prev !== mobile) setCarouselIdx(0); return mobile })
+    }
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   /* ── All scroll effects in one useEffect ── */
   useEffect(() => {
@@ -421,18 +432,20 @@ export default function LandingPage() {
         /* ── Responsive ── */
         @media (max-width:900px) {
           .nav-links-d { display:none !important; }
-        }
-        @media (max-width:900px) {
-          .features-g { grid-template-columns:repeat(2,1fr) !important; }
-          .modules-g  { grid-template-columns:repeat(5,1fr) !important; }
+          .features-g  { grid-template-columns:repeat(2,1fr) !important; }
+          .modules-g   { grid-template-columns:repeat(5,1fr) !important; }
         }
         @media (max-width:640px) {
-          .stats-row  { grid-template-columns:repeat(2,1fr) !important; }
-          .features-g { grid-template-columns:1fr !important; }
-          .modules-g  { grid-template-columns:repeat(3,1fr) !important; }
-          .footer-g   { grid-template-columns:1fr 1fr !important; }
-          .hero-btns  { flex-direction:column; align-items:stretch !important; }
+          .stats-row        { grid-template-columns:repeat(2,1fr) !important; }
+          .features-g       { grid-template-columns:1fr !important; }
+          .modules-g        { grid-template-columns:repeat(3,1fr) !important; }
+          .footer-g         { grid-template-columns:1fr 1fr !important; }
+          .hero-btns        { flex-direction:column; align-items:stretch !important; }
           .hero-btns .btn-primary, .hero-btns .btn-secondary { justify-content:center; }
+          .demo-grid        { grid-template-columns:1fr !important; gap:24px !important; }
+          .nav-hide-mobile  { display:none !important; }
+          .btn-primary { padding:11px 20px !important; font-size:14px !important; }
+          .btn-secondary { padding:11px 18px !important; font-size:14px !important; }
         }
       `}</style>
 
@@ -455,15 +468,15 @@ export default function LandingPage() {
             <a key={l.href} href={l.href} className="ln-link">{l.label}</a>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button className="btn-secondary btn-sm" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
             {lang === 'ar' ? 'EN' : 'AR'}
           </button>
           <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-secondary btn-sm" style={{ padding: '7px 10px', fontSize: 14 }}>
             {isDark ? '☀️' : '🌙'}
           </button>
-          <Link href="/login" className="ln-link" style={{ display: 'inline-block' }}>{lp.navLogin}</Link>
-          <Link href="/register" className="btn-secondary btn-sm">{lp.navRegister}</Link>
+          <Link href="/login" className="ln-link nav-hide-mobile" style={{ display: 'inline-block' }}>{lp.navLogin}</Link>
+          <Link href="/register" className="btn-secondary btn-sm nav-hide-mobile">{lp.navRegister}</Link>
           <button onClick={handleDemo} disabled={demoLoading} className="btn-primary btn-sm" style={{ opacity: demoLoading ? 0.75 : 1 }}>
             {demoLoading ? '...' : lp.navDemo}
           </button>
@@ -622,7 +635,7 @@ export default function LandingPage() {
       {/* ═══════════════════ DEMO CTA ═══════════════════ */}
       <section id="pricing" style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="reveal-section" style={{
+          <div className="reveal-section demo-grid" style={{
             background: L.surface, border: `1px solid ${L.border2}`, borderRadius: 20,
             padding: 'clamp(28px,5vw,56px)', position: 'relative', overflow: 'hidden',
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center',
@@ -672,38 +685,43 @@ export default function LandingPage() {
           </div>
 
           {/* Carousel */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
-              {lp.testimonials.slice(carouselIdx * 3, carouselIdx * 3 + 3).map((t, i) => (
-                <TestimonialCard key={carouselIdx * 3 + i} {...t} />
-              ))}
-            </div>
+          {(() => {
+            const perPage = isMobile ? 1 : 3
+            const totalPages = Math.ceil(lp.testimonials.length / perPage)
+            const maxIdx = totalPages - 1
+            const visible = lp.testimonials.slice(carouselIdx * perPage, carouselIdx * perPage + perPage)
+            return (
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
+                  {visible.map((t, i) => (
+                    <TestimonialCard key={carouselIdx * perPage + i} {...t} />
+                  ))}
+                </div>
 
-            {/* Dots */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}>
-              {/* Prev */}
-              <button
-                onClick={() => setCarouselIdx(p => Math.max(0, p - 1))}
-                disabled={carouselIdx === 0}
-                style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === 0 ? 'not-allowed' : 'pointer', opacity: carouselIdx === 0 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
-              >‹</button>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}>
+                  <button
+                    onClick={() => setCarouselIdx(p => Math.max(0, p - 1))}
+                    disabled={carouselIdx === 0}
+                    style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === 0 ? 'not-allowed' : 'pointer', opacity: carouselIdx === 0 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
+                  >‹</button>
 
-              {[0, 1, 2].map(i => (
-                <button
-                  key={i}
-                  onClick={() => setCarouselIdx(i)}
-                  style={{ width: carouselIdx === i ? 24 : 8, height: 8, borderRadius: 4, border: 'none', background: carouselIdx === i ? L.olive : L.border, cursor: 'pointer', transition: 'all 0.25s', padding: 0 }}
-                />
-              ))}
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCarouselIdx(i)}
+                      style={{ width: carouselIdx === i ? 24 : 8, height: 8, borderRadius: 4, border: 'none', background: carouselIdx === i ? L.olive : L.border, cursor: 'pointer', transition: 'all 0.25s', padding: 0 }}
+                    />
+                  ))}
 
-              {/* Next */}
-              <button
-                onClick={() => setCarouselIdx(p => Math.min(2, p + 1))}
-                disabled={carouselIdx === 2}
-                style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === 2 ? 'not-allowed' : 'pointer', opacity: carouselIdx === 2 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
-              >›</button>
-            </div>
-          </div>
+                  <button
+                    onClick={() => setCarouselIdx(p => Math.min(maxIdx, p + 1))}
+                    disabled={carouselIdx === maxIdx}
+                    style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === maxIdx ? 'not-allowed' : 'pointer', opacity: carouselIdx === maxIdx ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
+                  >›</button>
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </section>
 

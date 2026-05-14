@@ -147,7 +147,7 @@ export default function DashboardPage() {
   const todayStr = new Date().toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
-    <div style={{ padding: '1.75rem 2rem', flex: 1, minHeight: 0 }}>
+    <div style={{ padding: 'clamp(1rem,3vw,1.75rem) clamp(1rem,4vw,2rem)', flex: 1, minHeight: 0 }}>
 
       {/* Welcome Header */}
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Bottom row: Chart + Quick Actions + Activity */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '1.25rem', marginBottom: '1.5rem' }}>
+          <div className="dash-bottom-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '1.25rem', marginBottom: '1.5rem' }}>
 
             {/* Revenue Chart Card */}
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
