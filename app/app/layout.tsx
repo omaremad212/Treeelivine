@@ -71,7 +71,6 @@ const NAV_SECTIONS = [
   {
     label: { ar: 'النظام', en: 'System' },
     items: [
-      { href: '/app/templates',        labelAr: 'القوالب',         labelEn: 'Templates',         Icon: Icons.File,      perm: 'templates.read' },
       { href: '/app/settings',         labelAr: 'الإعدادات',       labelEn: 'Settings',          Icon: Icons.Settings,  perm: 'settings.read' },
     ],
   },

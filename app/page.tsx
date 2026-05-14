@@ -211,7 +211,7 @@ export default function LandingPage() {
       const res = await fetch('/api/seed', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
-        router.push('/app')
+        window.location.href = '/app'
       } else {
         alert(lp.demoFailMsg)
         setDemoLoading(false)
