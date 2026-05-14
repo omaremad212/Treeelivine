@@ -4,19 +4,72 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '@/contexts/AppContext'
 
-const NAV_ITEMS = [
-  { href: '/app', label: 'dashboard', icon: '📊', perm: null },
-  { href: '/app/crm', label: 'crm', icon: '👥', perm: 'crm.read' },
-  { href: '/app/projects', label: 'projects', icon: '📁', perm: 'projects.read' },
-  { href: '/app/tasks', label: 'tasks', icon: '✅', perm: 'tasks.read' },
-  { href: '/app/team', label: 'team', icon: '🏢', perm: 'team.read' },
-  { href: '/app/finance', label: 'finance', icon: '💰', perm: 'finance.read' },
-  { href: '/app/templates', label: 'templates', icon: '📄', perm: 'templates.read' },
-  { href: '/app/settings', label: 'settings', icon: '⚙️', perm: 'settings.read' },
+/* ── Lucide-style SVG icons (inline, no dep needed) ─────────────────── */
+function Icon({ d, size = 16 }: { d: string | string[]; size?: number }) {
+  const paths = Array.isArray(d) ? d : [d]
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      {paths.map((p, i) => <path key={i} d={p} />)}
+    </svg>
+  )
+}
+
+const Icons = {
+  Dashboard: () => <Icon d={['M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z', 'M9 22V12h6v10']} />,
+  Users:     () => <Icon d={['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', 'M23 21v-2a4 4 0 00-3-3.87', 'M16 3.13a4 4 0 010 7.75', 'M9 11a4 4 0 100-8 4 4 0 000 8z']} />,
+  Folder:    () => <Icon d={['M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z']} />,
+  CheckSq:   () => <Icon d={['M9 11l3 3L22 4', 'M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11']} />,
+  Building:  () => <Icon d={['M3 21h18', 'M5 21V7l8-4v18', 'M19 21V11l-6-4', 'M9 9v.01M9 12v.01M9 15v.01M9 18v.01']} />,
+  Wallet:    () => <Icon d={['M20 12V22H4V12', 'M22 7H2v5h20V7z', 'M12 22V7', 'M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z', 'M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z']} />,
+  File:      () => <Icon d={['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6', 'M16 13H8M16 17H8M10 9H8']} />,
+  Settings:  () => <Icon d={['M12 15a3 3 0 100-6 3 3 0 000 6z', 'M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z']} />,
+  Globe:     () => <Icon d={['M12 2a10 10 0 100 20A10 10 0 0012 2z', 'M2 12h20', 'M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z']} />,
+  Moon:      () => <Icon d={['M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z']} />,
+  Sun:       () => <Icon d={['M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42', 'M12 17a5 5 0 100-10 5 5 0 000 10z']} />,
+  Bell:      () => <Icon d={['M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9', 'M13.73 21a2 2 0 01-3.46 0']} />,
+  LogOut:    () => <Icon d={['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9']} />,
+  Search:    () => <Icon d={['M11 19a8 8 0 100-16 8 8 0 000 16z', 'M21 21l-4.35-4.35']} />,
+  Menu:      () => <Icon d={['M3 12h18M3 6h18M3 18h18']} />,
+}
+
+/* ── Brand logo SVG ──────────────────────────────────────────────────── */
+function BrandMark({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="currentColor">
+      <path d="M32 12 C 32 28, 32 44, 32 56" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <path d="M32 22 C 24 21, 16 17, 12 11 C 18 12, 26 16, 32 22 Z" />
+      <path d="M32 30 C 40 30, 48 27, 52 21 C 46 22, 38 25, 32 30 Z" />
+      <path d="M32 40 C 26 41, 20 39, 16 34 C 21 35, 27 36, 32 40 Z" />
+      <ellipse cx="36" cy="48" rx="3.2" ry="4.2" transform="rotate(20 36 48)" />
+    </svg>
+  )
+}
+
+/* ── Nav config ──────────────────────────────────────────────────────── */
+const NAV_SECTIONS = [
+  {
+    label: { ar: 'الرئيسية', en: 'Main' },
+    items: [
+      { href: '/app', labelAr: 'اللوحة', labelEn: 'Dashboard', Icon: Icons.Dashboard, perm: null, exact: true },
+      { href: '/app/crm', labelAr: 'العملاء', labelEn: 'CRM', Icon: Icons.Users, perm: 'crm.read' },
+      { href: '/app/projects', labelAr: 'المشاريع', labelEn: 'Projects', Icon: Icons.Folder, perm: 'projects.read' },
+      { href: '/app/tasks', labelAr: 'المهام', labelEn: 'Tasks', Icon: Icons.CheckSq, perm: 'tasks.read' },
+      { href: '/app/finance', labelAr: 'المالية', labelEn: 'Finance', Icon: Icons.Wallet, perm: 'finance.read' },
+    ],
+  },
+  {
+    label: { ar: 'الإدارة', en: 'Manage' },
+    items: [
+      { href: '/app/team', labelAr: 'الفريق', labelEn: 'Team', Icon: Icons.Building, perm: 'team.read' },
+      { href: '/app/templates', labelAr: 'القوالب', labelEn: 'Templates', Icon: Icons.File, perm: 'templates.read' },
+      { href: '/app/settings', labelAr: 'الإعدادات', labelEn: 'Settings', Icon: Icons.Settings, perm: 'settings.read' },
+    ],
+  },
 ]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, logout, hasPermission, t, lang, setLang, theme, setTheme } = useApp()
+  const { user, loading, logout, hasPermission, lang, setLang, theme, setTheme } = useApp()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -25,79 +78,126 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!loading && user && user.role === 'client') router.replace('/portal')
   }, [user, loading, router])
 
-  if (loading || !user) return null
+  if (loading || !user) {
+    return (
+      <div className="loading-page">
+        <div className="spinner" />
+      </div>
+    )
+  }
 
-  const visibleNav = NAV_ITEMS.filter(item => !item.perm || hasPermission(item.perm))
+  const isAr = lang === 'ar'
+
+  const initials = (user.name || user.email || '?')
+    .split(' ')
+    .map((w: string) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg)' }}>
-      {/* Sidebar */}
-      <aside style={{
-        width: 'var(--sidebar-width)',
-        background: 'var(--surface)',
-        borderInlineEnd: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
-        overflow: 'auto',
-      }}>
-        <div style={{ padding: '1.25rem 1rem', borderBottom: '1px solid var(--border)' }}>
-          <h1 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent)' }}>Treeelivine</h1>
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>ERP System</p>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg-app)' }}>
+      {/* ── Sidebar ────────────────────────────────────────────── */}
+      <aside className="sidebar">
+        {/* Brand */}
+        <div className="brand">
+          <span className="brand-icon"><BrandMark size={22} /></span>
+          <span className="brand-name">treeelivine</span>
         </div>
 
-        <nav style={{ flex: 1, padding: '0.75rem 0.5rem', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-          {visibleNav.map(item => {
-            const isActive = item.href === '/app' ? pathname === '/app' : pathname.startsWith(item.href)
+        {/* Navigation */}
+        <nav style={{ flex: 1, padding: 'var(--space-2) var(--space-2)', display: 'flex', flexDirection: 'column', gap: 0, overflowY: 'auto' }}>
+          {NAV_SECTIONS.map((section) => {
+            const visibleItems = section.items.filter(item => !item.perm || hasPermission(item.perm))
+            if (!visibleItems.length) return null
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '0.6rem',
-                  padding: '0.6rem 0.75rem', borderRadius: 8,
-                  fontSize: '0.875rem', fontWeight: isActive ? 600 : 400,
-                  color: isActive ? 'var(--accent)' : 'var(--text)',
-                  background: isActive ? 'var(--accent)11' : 'transparent',
-                  textDecoration: 'none',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <span>{item.icon}</span>
-                <span>{(t as any)[item.label] || item.label}</span>
-              </Link>
+              <div key={section.label.en}>
+                <div className="nav-section">{isAr ? section.label.ar : section.label.en}</div>
+                {visibleItems.map((item) => {
+                  const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`nav-item${isActive ? ' active' : ''}`}
+                    >
+                      <item.Icon />
+                      <span>{isAr ? item.labelAr : item.labelEn}</span>
+                    </Link>
+                  )
+                })}
+              </div>
             )
           })}
         </nav>
 
-        <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: '#fff', fontWeight: 600 }}>
-              {(user.name || user.email || '?')[0].toUpperCase()}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '0.8rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name || user.email}</p>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{user.role}</p>
-            </div>
+        {/* User block */}
+        <div className="user-block">
+          <div className="av av-md">{initials}</div>
+          <div className="meta">
+            <div className="name">{user.name || user.email}</div>
+            <div className="role">{user.role}</div>
           </div>
-          <div style={{ display: 'flex', gap: '0.35rem' }}>
-            <button className="btn btn-secondary" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} style={{ flex: 1, justifyContent: 'center', fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}>
-              {lang === 'ar' ? 'EN' : 'AR'}
-            </button>
-            <button className="btn btn-secondary" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} style={{ flex: 1, justifyContent: 'center', fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}>
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-            <button className="btn btn-secondary" onClick={logout} style={{ flex: 1, justifyContent: 'center', fontSize: '0.75rem', padding: '0.35rem 0.5rem' }} title="Logout">
-              ↩
-            </button>
-          </div>
+          <button
+            className="iconbtn"
+            onClick={logout}
+            title={isAr ? 'تسجيل الخروج' : 'Sign out'}
+            style={{ marginInlineStart: 'auto', flexShrink: 0 }}
+          >
+            <Icons.LogOut />
+          </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        {children}
-      </main>
+      {/* ── Main content (offset by sidebar width) ────────────── */}
+      <div style={{
+        flex: 1,
+        marginInlineStart: 'var(--sidebar-w)',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        overflow: 'hidden',
+      }}>
+        {/* Topbar */}
+        <header className="topbar">
+          {/* Search */}
+          <div className="search-bar" style={{ flex: 1, maxWidth: 340 }}>
+            <Icons.Search />
+            <input placeholder={isAr ? 'ابحث في كل النظام…' : 'Search…'} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-5)' }}>⌘K</span>
+          </div>
+
+          {/* Right controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginInlineStart: 'auto' }}>
+            <button
+              className="iconbtn"
+              style={{ width: 'auto', padding: '0 var(--space-2)', gap: 4 }}
+              onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+              title="Toggle language"
+            >
+              <Icons.Globe />
+              <span style={{ fontSize: 11, fontWeight: 500 }}>{lang === 'ar' ? 'EN' : 'AR'}</span>
+            </button>
+            <button
+              className="iconbtn"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
+            </button>
+            <button className="iconbtn" title={isAr ? 'الإشعارات' : 'Notifications'}>
+              <Icons.Bell />
+            </button>
+            <div style={{ width: 1, height: 20, background: 'var(--border-1)', margin: '0 var(--space-1)' }} />
+            <div className="av av-md" style={{ cursor: 'default' }}>{initials}</div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

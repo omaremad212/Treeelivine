@@ -3,13 +3,16 @@ import './globals.css'
 import { AppProvider } from '@/contexts/AppContext'
 
 export const metadata: Metadata = {
-  title: 'Treeelivine ERP',
-  description: 'Unified operations center for marketing agencies',
+  title: 'Treeelivine ERP — نظام إدارة الوكالات',
+  description: 'منصة ERP متكاملة لإدارة وكالات التسويق والشركات الخدمية — عملاء، مشاريع، مهام، مالية.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ar" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body>
         <AppProvider>{children}</AppProvider>
       </body>
