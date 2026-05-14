@@ -15,7 +15,7 @@ const IC = ({ d, size = 16 }: { d: string | string[]; size?: number }) => (
 )
 
 export default function QuotationsPage() {
-  const { hasPermission, settings } = useApp()
+  const { t, hasPermission, settings } = useApp()
   const cur = settings?.defaultCurrency || 'SAR'
 
   const [quotes,     setQuotes]     = useState<any[]>([])
@@ -105,12 +105,12 @@ export default function QuotationsPage() {
     <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>Quotations</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Create and track client quotations</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.quotations || 'Quotations'}</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.subtitle || 'Create and track client quotations'}</p>
         </div>
         {hasPermission('finance.write') && (
           <button className="btn btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IC d="M12 5v14M5 12h14" /> New Quotation
+            <IC d="M12 5v14M5 12h14" /> {t.newQuotation || 'New Quotation'}
           </button>
         )}
       </div>
@@ -118,11 +118,11 @@ export default function QuotationsPage() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
         {[
-          { label: 'Total Quotes',   value: String(quotes.length),                       color: 'var(--fg-1)' },
-          { label: 'Draft',          value: String(counts.draft),                         color: '#6b7280' },
-          { label: 'Sent',           value: String(counts.sent),                          color: '#2563eb' },
-          { label: 'Accepted',       value: String(counts.accepted),                      color: '#059669' },
-          { label: 'Accepted Value', value: `${cur} ${counts.totalVal.toLocaleString()}`, color: '#059669' },
+          { label: t.totalQuotes,    value: String(quotes.length),                       color: 'var(--fg-1)' },
+          { label: t.draft,          value: String(counts.draft),                         color: '#6b7280' },
+          { label: t.sent,           value: String(counts.sent),                          color: '#2563eb' },
+          { label: t.accepted,       value: String(counts.accepted),                      color: '#059669' },
+          { label: t.acceptedValue,  value: `${cur} ${counts.totalVal.toLocaleString()}`, color: '#059669' },
         ].map(s => (
           <div key={s.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '0.875rem 1.25rem' }}>
             <p style={{ fontSize: '0.72rem', color: 'var(--fg-4)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 500, marginBottom: '0.3rem' }}>{s.label}</p>
@@ -140,7 +140,7 @@ export default function QuotationsPage() {
             color: filterStatus === s ? 'var(--fg-1)' : 'var(--fg-4)',
             boxShadow: filterStatus === s ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
           }}>
-            {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All'}
+            {s ? s.charAt(0).toUpperCase() + s.slice(1) : (t.all || 'All')}
           </button>
         ))}
       </div>
@@ -150,7 +150,7 @@ export default function QuotationsPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                {['Quote #', 'Client', 'Amount', 'Tax', 'Total', 'Status', 'Valid Until', 'Actions'].map(h => (
+                {[t.quoteNumber, t.client, t.amount, t.taxCol, t.total, t.status, t.validUntil, t.actions].map(h => (
                   <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                 ))}
               </tr>
@@ -176,16 +176,16 @@ export default function QuotationsPage() {
                   <td style={{ padding: '0.875rem 1rem', fontSize: '0.82rem', color: 'var(--fg-4)' }}>{q.validUntil ? new Date(q.validUntil).toLocaleDateString() : '—'}</td>
                   <td style={{ padding: '0.875rem 1rem' }}>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
-                      {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(q)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Edit</button>}
-                      {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(q)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Delete</button>}
+                      {hasPermission('finance.write') && <button className="btn btn-secondary" onClick={() => openEdit(q)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.edit || 'Edit'}</button>}
+                      {hasPermission('finance.write') && <button className="btn btn-danger" onClick={() => setDeleteTarget(q)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.delete || 'Delete'}</button>}
                     </div>
                   </td>
                 </tr>
               ))}
               {quotes.length === 0 && (
                 <tr><td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: 'var(--fg-4)' }}>
-                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>No quotations yet</p>
-                  <p style={{ fontSize: '0.8rem' }}>Create a quotation to send to a client</p>
+                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{t.noQuotations || 'No quotations yet'}</p>
+                  <p style={{ fontSize: '0.8rem' }}>{t.createFirst || 'Create a quotation to send to a client'}</p>
                 </td></tr>
               )}
             </tbody>
@@ -193,65 +193,65 @@ export default function QuotationsPage() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Quotation' : 'New Quotation'} width={640}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? (t.editQuotation || 'Edit Quotation') : (t.newQuotation || 'New Quotation')} width={640}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
             <div>
-              <label className="label">Client *</label>
+              <label className="label">{t.client || 'Client'} *</label>
               <select className="input" value={form.customerId || ''} onChange={e => setForm((p: any) => ({ ...p, customerId: e.target.value }))}>
-                <option value="">Select client…</option>
+                <option value="">{t.selectClient || 'Select client…'}</option>
                 {customers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="label">Project</label>
+              <label className="label">{t.project || 'Project'}</label>
               <select className="input" value={form.projectId || ''} onChange={e => setForm((p: any) => ({ ...p, projectId: e.target.value }))}>
-                <option value="">None</option>
+                <option value="">{t.noneProject || 'None'}</option>
                 {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
               </select>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.875rem' }}>
             <div>
-              <label className="label">Status</label>
+              <label className="label">{t.status || 'Status'}</label>
               <select className="input" value={form.status || 'draft'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                 {QUOTE_STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
               </select>
             </div>
-            <div><label className="label">Tax Rate %</label><input className="input" type="number" value={form.taxRate ?? 15} onChange={e => setForm((p: any) => ({ ...p, taxRate: Number(e.target.value) }))} /></div>
-            <div><label className="label">Valid Until</label><input className="input" type="date" value={form.validUntil ? form.validUntil.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, validUntil: e.target.value }))} /></div>
+            <div><label className="label">{t.taxRate || 'Tax Rate %'}</label><input className="input" type="number" value={form.taxRate ?? 15} onChange={e => setForm((p: any) => ({ ...p, taxRate: Number(e.target.value) }))} /></div>
+            <div><label className="label">{t.validUntil || 'Valid Until'}</label><input className="input" type="date" value={form.validUntil ? form.validUntil.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, validUntil: e.target.value }))} /></div>
           </div>
 
           <div>
-            <label className="label" style={{ marginBottom: '0.5rem', display: 'block' }}>Line Items</label>
+            <label className="label" style={{ marginBottom: '0.5rem', display: 'block' }}>{t.lineItems || 'Line Items'}</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {items.map((item, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 100px 28px', gap: '0.4rem', alignItems: 'center' }}>
-                  <input className="input" placeholder="Description" value={item.description} onChange={e => updateItem(i, 'description', e.target.value)} style={{ fontSize: '0.82rem' }} />
-                  <input className="input" type="number" placeholder="Qty" value={item.qty} onChange={e => updateItem(i, 'qty', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
-                  <input className="input" type="number" placeholder="Unit Price" value={item.price} onChange={e => updateItem(i, 'price', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" placeholder={t.description || 'Description'} value={item.description} onChange={e => updateItem(i, 'description', e.target.value)} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" type="number" placeholder={t.qty || 'Qty'} value={item.qty} onChange={e => updateItem(i, 'qty', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" type="number" placeholder={t.unitPrice || 'Unit Price'} value={item.price} onChange={e => updateItem(i, 'price', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
                   <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', fontSize: '1.1rem', padding: 0, lineHeight: 1 }}>×</button>
                 </div>
               ))}
-              <button className="btn btn-secondary" onClick={addItem} style={{ fontSize: '0.78rem', alignSelf: 'flex-start' }}>+ Add Line</button>
+              <button className="btn btn-secondary" onClick={addItem} style={{ fontSize: '0.78rem', alignSelf: 'flex-start' }}>{t.addLine || '+ Add Line'}</button>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem', fontSize: '0.85rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-            <span>Subtotal: <strong>{cur} {modalSub.toLocaleString()}</strong></span>
-            <span>Tax ({form.taxRate || 0}%): <strong>{cur} {modalTax.toLocaleString()}</strong></span>
-            <span style={{ fontWeight: 700 }}>Total: {cur} {modalTotal.toLocaleString()}</span>
+            <span>{t.subtotalLabel || 'Subtotal:'} <strong>{cur} {modalSub.toLocaleString()}</strong></span>
+            <span>{t.taxLabel || 'Tax'} ({form.taxRate || 0}%): <strong>{cur} {modalTax.toLocaleString()}</strong></span>
+            <span style={{ fontWeight: 700 }}>{t.totalLabel || 'Total:'} {cur} {modalTotal.toLocaleString()}</span>
           </div>
 
-          <div><label className="label">Notes</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
+          <div><label className="label">{t.notes || 'Notes'}</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Create Quotation'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel || 'Cancel'}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? (t.saving || 'Saving…') : editing ? (t.saveChanges || 'Save Changes') : (t.createQuotation || 'Create Quotation')}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Quotation" message={`Delete quotation "${deleteTarget?.quoteNumber}"?`} loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.deleteQuotation || 'Delete Quotation'} message={`${t.deleteQuotation || 'Delete quotation'} "${deleteTarget?.quoteNumber}"?`} loading={deleting} />
     </div>
   )
 }

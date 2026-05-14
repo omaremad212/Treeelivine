@@ -26,7 +26,7 @@ function Stat({ label, value, color, sub }: { label: string; value: string; colo
 }
 
 export default function InvoicesPage() {
-  const { hasPermission, settings } = useApp()
+  const { t, hasPermission, settings } = useApp()
   const cur = settings?.defaultCurrency || 'SAR'
 
   const [invoices,   setInvoices]   = useState<any[]>([])
@@ -106,22 +106,22 @@ export default function InvoicesPage() {
     <div style={{ padding: '1.75rem 2rem', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>Invoices</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>Track and manage all client invoices</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--fg-1)' }}>{t.invoices || 'Invoices'}</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--fg-4)', marginTop: 2 }}>{t.invoicesSubtitle || 'Track and manage all client invoices'}</p>
         </div>
         {hasPermission('finance.write') && (
           <button className="btn btn-primary" onClick={openCreate} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IC d="M12 5v14M5 12h14" /> New Invoice
+            <IC d="M12 5v14M5 12h14" /> {t.newInvoice || 'New Invoice'}
           </button>
         )}
       </div>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
-        <Stat label="Total Invoices" value={String(invoices.length)}                        color="var(--fg-1)" />
-        <Stat label="Collected"      value={`${cur} ${totalRev.toLocaleString()}`}          color="#059669" sub={`${invoices.filter(i=>i.status==='paid').length} paid`} />
-        <Stat label="Outstanding"    value={`${cur} ${totalUnpaid.toLocaleString()}`}       color="#dc2626" sub={`${invoices.filter(i=>i.status!=='paid'&&i.status!=='draft').length} unpaid`} />
-        <Stat label="Drafts"         value={String(invoices.filter(i=>i.status==='draft').length)} color="var(--fg-4)" />
+        <Stat label={t.totalInvoices || 'Total Invoices'} value={String(invoices.length)}                        color="var(--fg-1)" />
+        <Stat label={t.collected || 'Collected'}      value={`${cur} ${totalRev.toLocaleString()}`}          color="#059669" sub={`${invoices.filter(i=>i.status==='paid').length} ${t.paidCount || 'paid'}`} />
+        <Stat label={t.outstanding || 'Outstanding'}    value={`${cur} ${totalUnpaid.toLocaleString()}`}       color="#dc2626" sub={`${invoices.filter(i=>i.status!=='paid'&&i.status!=='draft').length} ${t.unpaidCount || 'unpaid'}`} />
+        <Stat label={t.drafts || 'Drafts'}         value={String(invoices.filter(i=>i.status==='draft').length)} color="var(--fg-4)" />
       </div>
 
       {/* Filter tabs */}
@@ -133,7 +133,7 @@ export default function InvoicesPage() {
             color: filterStatus === s ? 'var(--fg-1)' : 'var(--fg-4)',
             boxShadow: filterStatus === s ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
           }}>
-            {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All'}
+            {s ? s.charAt(0).toUpperCase() + s.slice(1) : (t.all || 'All')}
           </button>
         ))}
       </div>
@@ -143,7 +143,7 @@ export default function InvoicesPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                {['Invoice #', 'Client', 'Amount', 'Paid', 'Status', 'Due Date', 'Actions'].map(h => (
+                {[t.invoiceNumber, t.invoiceClient, t.invoiceAmount, t.invoicePaid, t.status, t.invoiceDueDate, t.invoiceActions].map(h => (
                   <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'start', fontSize: '0.75rem', color: 'var(--fg-4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                 ))}
               </tr>
@@ -163,10 +163,10 @@ export default function InvoicesPage() {
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
                       <Link href={`/app/finance/invoices/${inv._id}/pdf`} className="btn btn-secondary" style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>PDF</Link>
                       {hasPermission('finance.write') && (
-                        <button className="btn btn-secondary" onClick={() => openEdit(inv)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Edit</button>
+                        <button className="btn btn-secondary" onClick={() => openEdit(inv)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.edit || 'Edit'}</button>
                       )}
                       {hasPermission('finance.write') && (
-                        <button className="btn btn-danger" onClick={() => setDeleteTarget(inv)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>Delete</button>
+                        <button className="btn btn-danger" onClick={() => setDeleteTarget(inv)} style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}>{t.delete || 'Delete'}</button>
                       )}
                     </div>
                   </td>
@@ -174,8 +174,8 @@ export default function InvoicesPage() {
               ))}
               {filtered.length === 0 && (
                 <tr><td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: 'var(--fg-4)' }}>
-                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>No invoices found</p>
-                  <p style={{ fontSize: '0.8rem' }}>Create your first invoice to get started</p>
+                  <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{t.noInvoices || 'No invoices found'}</p>
+                  <p style={{ fontSize: '0.8rem' }}>{t.createFirstInvoice || 'Create your first invoice to get started'}</p>
                 </td></tr>
               )}
             </tbody>
@@ -184,66 +184,66 @@ export default function InvoicesPage() {
       )}
 
       {/* Create/Edit Modal */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Invoice' : 'New Invoice'} width={620}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? (t.editInvoice || 'Edit Invoice') : (t.newInvoice || 'New Invoice')} width={620}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
             <div>
-              <label className="label">Client *</label>
+              <label className="label">{t.invoiceClient || 'Client'} *</label>
               <select className="input" value={form.customerId || ''} onChange={e => setForm((p: any) => ({ ...p, customerId: e.target.value }))}>
-                <option value="">Select client…</option>
+                <option value="">{t.selectClient || 'Select client…'}</option>
                 {customers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="label">Project</label>
+              <label className="label">{t.project || 'Project'}</label>
               <select className="input" value={form.projectId || ''} onChange={e => setForm((p: any) => ({ ...p, projectId: e.target.value }))}>
-                <option value="">None</option>
+                <option value="">{t.noneProject || 'None'}</option>
                 {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
               </select>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.875rem' }}>
             <div>
-              <label className="label">Status</label>
+              <label className="label">{t.status || 'Status'}</label>
               <select className="input" value={form.status || 'unpaid'} onChange={e => setForm((p: any) => ({ ...p, status: e.target.value }))}>
                 {INVOICE_STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
               </select>
             </div>
-            <div><label className="label">Tax Rate %</label><input className="input" type="number" value={form.taxRate ?? 15} onChange={e => setForm((p: any) => ({ ...p, taxRate: Number(e.target.value) }))} /></div>
-            <div><label className="label">Due Date</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
+            <div><label className="label">{t.taxRate || 'Tax Rate %'}</label><input className="input" type="number" value={form.taxRate ?? 15} onChange={e => setForm((p: any) => ({ ...p, taxRate: Number(e.target.value) }))} /></div>
+            <div><label className="label">{t.invoiceDueDate || 'Due Date'}</label><input className="input" type="date" value={form.dueDate ? form.dueDate.substring(0, 10) : ''} onChange={e => setForm((p: any) => ({ ...p, dueDate: e.target.value }))} /></div>
           </div>
 
           {/* Line items */}
           <div>
-            <label className="label" style={{ marginBottom: '0.5rem', display: 'block' }}>Line Items</label>
+            <label className="label" style={{ marginBottom: '0.5rem', display: 'block' }}>{t.lineItems || 'Line Items'}</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {items.map((item, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 90px 30px', gap: '0.4rem', alignItems: 'center' }}>
-                  <input className="input" placeholder="Description" value={item.description} onChange={e => updateItem(i, 'description', e.target.value)} style={{ fontSize: '0.82rem' }} />
-                  <input className="input" type="number" placeholder="Qty" value={item.qty} onChange={e => updateItem(i, 'qty', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
-                  <input className="input" type="number" placeholder="Price" value={item.price} onChange={e => updateItem(i, 'price', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" placeholder={t.description || 'Description'} value={item.description} onChange={e => updateItem(i, 'description', e.target.value)} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" type="number" placeholder={t.qty || 'Qty'} value={item.qty} onChange={e => updateItem(i, 'qty', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
+                  <input className="input" type="number" placeholder={t.unitPrice || 'Price'} value={item.price} onChange={e => updateItem(i, 'price', Number(e.target.value))} style={{ fontSize: '0.82rem' }} />
                   <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', fontSize: '1rem', padding: 0 }}>×</button>
                 </div>
               ))}
-              <button className="btn btn-secondary" onClick={addItem} style={{ fontSize: '0.78rem', alignSelf: 'flex-start' }}>+ Add Line</button>
+              <button className="btn btn-secondary" onClick={addItem} style={{ fontSize: '0.78rem', alignSelf: 'flex-start' }}>{t.addLine || '+ Add Line'}</button>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem', fontSize: '0.85rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-            <span>Subtotal: <strong>{cur} {modalSubtotal.toLocaleString()}</strong></span>
-            <span>Tax ({form.taxRate || 0}%): <strong>{cur} {(modalSubtotal * (Number(form.taxRate || 0) / 100)).toLocaleString()}</strong></span>
-            <span style={{ fontWeight: 700 }}>Total: {cur} {(modalSubtotal * (1 + Number(form.taxRate || 0) / 100)).toLocaleString()}</span>
+            <span>{t.subtotalLabel || 'Subtotal:'} <strong>{cur} {modalSubtotal.toLocaleString()}</strong></span>
+            <span>{t.taxLabel || 'Tax'} ({form.taxRate || 0}%): <strong>{cur} {(modalSubtotal * (Number(form.taxRate || 0) / 100)).toLocaleString()}</strong></span>
+            <span style={{ fontWeight: 700 }}>{t.totalLabel || 'Total:'} {cur} {(modalSubtotal * (1 + Number(form.taxRate || 0) / 100)).toLocaleString()}</span>
           </div>
 
-          <div><label className="label">Notes</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
+          <div><label className="label">{t.notes || 'Notes'}</label><textarea className="input" value={form.notes || ''} onChange={e => setForm((p: any) => ({ ...p, notes: e.target.value }))} rows={2} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : editing ? 'Save Changes' : 'Create Invoice'}</button>
+            <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>{t.cancel || 'Cancel'}</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? (t.saving || 'Saving…') : editing ? (t.saveChanges || 'Save Changes') : (t.createInvoice || 'Create Invoice')}</button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Invoice" message={`Delete invoice "${deleteTarget?.invoiceNumber}"? This cannot be undone.`} loading={deleting} />
+      <ConfirmModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title={t.deleteInvoice || 'Delete Invoice'} message={`${t.deleteInvoice || 'Delete invoice'} "${deleteTarget?.invoiceNumber}"? ${t.deleteInvoiceMsg || 'This cannot be undone.'}`} loading={deleting} />
     </div>
   )
 }
