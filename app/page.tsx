@@ -129,7 +129,8 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 ═══════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const router = useRouter()
-  const { theme, setTheme } = useApp()
+  const { theme, setTheme, lang, setLang } = useApp()
+  const [carouselIdx, setCarouselIdx] = useState(0)
   const [demoLoading, setDemoLoading] = useState(false)
   const [navScrolled, setNavScrolled] = useState(false)
 
@@ -240,6 +241,12 @@ export default function LandingPage() {
     { quote: 'Treeelivine غيّر طريقة إدارتنا للفريق. الآن كل شيء في مكان واحد ولا يفوتنا شيء.', name: 'أحمد الزهراني', role: 'مدير وكالة تسويق', initials: 'أز' },
     { quote: 'بوابة العميل رائعة! يقدر عملاؤنا يتابعون مشاريعهم ويوافقون على البريف مباشرةً.', name: 'سارة العمري', role: 'CEO — إبداع الرقمي', initials: 'سع' },
     { quote: 'الفواتير والمصروفات أصبحت سهلة جداً. وفّرنا ساعات من العمل اليدوي كل أسبوع.', name: 'فهد المطيري', role: 'مدير مالي', initials: 'فم' },
+    { quote: 'إدارة المشاريع والمهام صارت أوضح بكثير. كل فرد في الفريق يعرف مهامه بالضبط.', name: 'نورة الشمري', role: 'مديرة مشاريع', initials: 'نش' },
+    { quote: 'النظام سهّل علينا متابعة العملاء من أول تواصل لحين إغلاق الصفقة. ممتاز جداً.', name: 'خالد العتيبي', role: 'مدير مبيعات', initials: 'خع' },
+    { quote: 'التقارير المالية الآن تُنجز في دقائق بدلاً من ساعات. ربحنا وقتاً ثميناً جداً.', name: 'ريم الحارثي', role: 'CFO — نور ميديا', initials: 'رح' },
+    { quote: 'صلاحيات الأدوار دقيقة جداً. كل موظف يرى فقط ما يخصه وهذا يحسّن الإنتاجية.', name: 'طارق السبيعي', role: 'CTO — سحاب تك', initials: 'طس' },
+    { quote: 'بريف المشاريع ووثائق العميل كلها في مكان واحد. لا مزيد من البريد والواتساب.', name: 'منى القحطاني', role: 'مديرة محتوى', initials: 'مق' },
+    { quote: 'الديمو كان كافياً لأقرر الاشتراك فوراً. النظام واضح وسريع ومُصمَّم للعرب.', name: 'عمر الدوسري', role: 'صاحب وكالة إبداعية', initials: 'عد' },
   ]
 
   const faqs = [
@@ -347,11 +354,14 @@ export default function LandingPage() {
         @media (max-width:900px) {
           .nav-links-d { display:none !important; }
         }
+        @media (max-width:900px) {
+          .features-g { grid-template-columns:repeat(2,1fr) !important; }
+          .modules-g  { grid-template-columns:repeat(5,1fr) !important; }
+        }
         @media (max-width:640px) {
-          .stats-row { grid-template-columns:repeat(2,1fr) !important; }
+          .stats-row  { grid-template-columns:repeat(2,1fr) !important; }
           .features-g { grid-template-columns:1fr !important; }
           .modules-g  { grid-template-columns:repeat(3,1fr) !important; }
-          .testimonials-g { grid-template-columns:1fr !important; }
           .footer-g   { grid-template-columns:1fr 1fr !important; }
           .hero-btns  { flex-direction:column; align-items:stretch !important; }
           .hero-btns .btn-primary, .hero-btns .btn-secondary { justify-content:center; }
@@ -378,11 +388,13 @@ export default function LandingPage() {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button className="btn-secondary btn-sm" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
+            {lang === 'ar' ? 'EN' : 'AR'}
+          </button>
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="btn-secondary btn-sm"
             style={{ padding: '7px 10px', fontSize: 14 }}
-            title={isDark ? 'وضع فاتح' : 'وضع داكن'}
           >
             {isDark ? '☀️' : '🌙'}
           </button>
@@ -519,7 +531,7 @@ export default function LandingPage() {
               <AnimatedWords text="منصة متكاملة تجمع كل أدوات إدارة الأعمال في مكان واحد" baseDelay={300} />
             </p>
           </div>
-          <div className="cards-container features-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16 }}>
+          <div className="cards-container features-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
             {features.map((f, i) => <FeatureCard key={i} {...f} />)}
           </div>
         </div>
@@ -537,7 +549,7 @@ export default function LandingPage() {
               <AnimatedWords text="كل وحدة مصممة لتحل مشكلة محددة وتتكامل مع باقي الوحدات" baseDelay={280} />
             </p>
           </div>
-          <div className="cards-container modules-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 12 }}>
+          <div className="cards-container modules-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(9,1fr)', gap: 10 }}>
             {modules.map((m, i) => <ModuleBadge key={i} {...m} />)}
           </div>
         </div>
@@ -587,15 +599,46 @@ export default function LandingPage() {
 
       {/* ═══════════════════ TESTIMONIALS ═══════════════════ */}
       <section style={{ padding: 'clamp(56px,8vw,96px) clamp(16px,4vw,24px)', background: L.surface, borderTop: `1px solid ${L.border}`, borderBottom: `1px solid ${L.border}` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="reveal-section" style={{ textAlign: 'center', marginBottom: 48 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
+          <div className="reveal-section" style={{ marginBottom: 48 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: L.olive, marginBottom: 14 }}>آراء العملاء</div>
             <h2 style={{ fontSize: 'clamp(22px,3.5vw,38px)', fontWeight: 700, color: L.fg1, letterSpacing: '-0.015em' }}>
               <AnimatedWords text="ماذا يقول مستخدمونا" />
             </h2>
           </div>
-          <div className="cards-container testimonials-g" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16 }}>
-            {testimonials.map((t, i) => <TestimonialCard key={i} {...t} />)}
+
+          {/* Carousel */}
+          <div style={{ position: 'relative' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
+              {testimonials.slice(carouselIdx * 3, carouselIdx * 3 + 3).map((t, i) => (
+                <TestimonialCard key={carouselIdx * 3 + i} {...t} />
+              ))}
+            </div>
+
+            {/* Dots */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}>
+              {/* Prev */}
+              <button
+                onClick={() => setCarouselIdx(p => Math.max(0, p - 1))}
+                disabled={carouselIdx === 0}
+                style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === 0 ? 'not-allowed' : 'pointer', opacity: carouselIdx === 0 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
+              >‹</button>
+
+              {[0, 1, 2].map(i => (
+                <button
+                  key={i}
+                  onClick={() => setCarouselIdx(i)}
+                  style={{ width: carouselIdx === i ? 24 : 8, height: 8, borderRadius: 4, border: 'none', background: carouselIdx === i ? L.olive : L.border, cursor: 'pointer', transition: 'all 0.25s', padding: 0 }}
+                />
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={() => setCarouselIdx(p => Math.min(2, p + 1))}
+                disabled={carouselIdx === 2}
+                style={{ width: 32, height: 32, borderRadius: '50%', border: `1px solid ${L.border}`, background: 'var(--bg-surface)', color: L.fg3, cursor: carouselIdx === 2 ? 'not-allowed' : 'pointer', opacity: carouselIdx === 2 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'opacity 0.2s' }}
+              >›</button>
+            </div>
           </div>
         </div>
       </section>
