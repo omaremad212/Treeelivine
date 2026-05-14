@@ -25,9 +25,11 @@ function AnimatedWords({ text, baseDelay = 0 }: { text: string; baseDelay?: numb
   return (
     <>
       {text.split(' ').map((word, i) => (
-        <span key={i} className="aw-wrap">
-          <span className="aw-word" style={{ transitionDelay: `${baseDelay + i * 70}ms` }}>
-            {word}
+        <span key={i} style={{ display: 'inline' }}>
+          <span className="aw-wrap">
+            <span className="aw-word" style={{ transitionDelay: `${baseDelay + i * 70}ms` }}>
+              {word}
+            </span>
           </span>
           {' '}
         </span>
