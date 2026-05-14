@@ -37,23 +37,6 @@ function AnimatedWords({ text, baseDelay = 0 }: { text: string; baseDelay?: numb
 }
 
 
-/* ── Floating integration icon ────────────────────────────────────────── */
-function FloatingIcon({ icon, bg, color, style }: { icon: React.ReactNode; bg: string; color: string; style: React.CSSProperties }) {
-  return (
-    <div style={{
-      position: 'absolute',
-      width: 52, height: 52,
-      background: bg,
-      borderRadius: 14,
-      boxShadow: '0 8px 28px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color,
-      ...style,
-    }}>
-      {icon}
-    </div>
-  )
-}
 
 /* ── Feature card ─────────────────────────────────────────────────────── */
 const FeatureIcons: Record<string, React.ReactNode> = {
@@ -363,7 +346,6 @@ export default function LandingPage() {
         /* ── Responsive ── */
         @media (max-width:900px) {
           .nav-links-d { display:none !important; }
-          .hero-floating { display:none !important; }
         }
         @media (max-width:640px) {
           .stats-row { grid-template-columns:repeat(2,1fr) !important; }
@@ -413,49 +395,14 @@ export default function LandingPage() {
       </nav>
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section style={{ paddingTop: 'clamp(110px,14vw,150px)', paddingBottom: 0, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ paddingTop: 'clamp(90px,12vw,130px)', paddingBottom: 0, textAlign: 'center', position: 'relative' }}>
 
         {/* Subtle radial glow */}
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 500, background: 'radial-gradient(ellipse at center top, rgba(79,104,49,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-        {/* Floating icons — hidden on mobile */}
-        <div className="hero-floating" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-          {/* Top-left */}
-          <FloatingIcon
-            icon={<svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#2f6bbf" strokeWidth={1.75} strokeLinecap="round"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>}
-            bg="#e9f0fa" color="#2f6bbf"
-            style={{ top: '18%', left: '7%', transform: 'rotate(-8deg)', animation: 'float1 6s ease-in-out infinite' }}
-          />
-          {/* Top-right */}
-          <FloatingIcon
-            icon={<svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#c87a52" strokeWidth={1.75} strokeLinecap="round"><path d="M20 7H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>}
-            bg="#fbf3ee" color="#c87a52"
-            style={{ top: '12%', right: '6%', transform: 'rotate(9deg)', animation: 'float2 7s ease-in-out infinite' }}
-          />
-          {/* Mid-left */}
-          <FloatingIcon
-            icon={<svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#4f6831" strokeWidth={1.75} strokeLinecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx={9} cy={7} r={4}/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>}
-            bg="#f3f6ee" color="#4f6831"
-            style={{ top: '42%', left: '4%', transform: 'rotate(5deg)', animation: 'float3 8s ease-in-out infinite' }}
-          />
-          {/* Mid-right */}
-          <FloatingIcon
-            icon={<svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#2f8a3e" strokeWidth={1.75} strokeLinecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>}
-            bg="#ecf6ec" color="#2f8a3e"
-            style={{ top: '38%', right: '4%', transform: 'rotate(-7deg)', animation: 'float1 9s ease-in-out infinite 1s' }}
-          />
-        </div>
-
-        <style>{`
-          @keyframes float1 { 0%,100%{transform:rotate(-8deg) translateY(0)} 50%{transform:rotate(-8deg) translateY(-10px)} }
-          @keyframes float2 { 0%,100%{transform:rotate(9deg) translateY(0)} 50%{transform:rotate(9deg) translateY(-12px)} }
-          @keyframes float3 { 0%,100%{transform:rotate(5deg) translateY(0)} 50%{transform:rotate(5deg) translateY(-8px)} }
-        `}</style>
-
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 clamp(16px,4vw,24px)', position: 'relative' }}>
           {/* Trust badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 16px 6px 10px', borderRadius: 999, background: L.surface, border: `1px solid ${L.border}`, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 32, animation: 'wordIn 0.6s ease both' }}>
-            {/* Mini avatars */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 16px 6px 10px', borderRadius: 999, background: L.surface, border: `1px solid ${L.border}`, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 28, animation: 'wordIn 0.6s ease both' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {['#4f6831','#2f6bbf','#c87a52'].map((c, i) => (
                 <div key={i} style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: '2px solid #fff', marginInlineEnd: i < 2 ? -6 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: '#fff', fontWeight: 700 }}>
@@ -464,11 +411,11 @@ export default function LandingPage() {
               ))}
             </div>
             <span style={{ fontSize: 12, color: L.fg3, fontWeight: 500 }}>موثوق من مئات الوكالات</span>
-            <span className="animate-pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#2f8a3e', display: 'inline-block', flexShrink: 0 }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2f8a3e', display: 'inline-block', flexShrink: 0 }} />
           </div>
 
           {/* Main headline — word by word on load */}
-          <h1 style={{ fontSize: 'clamp(30px,5.5vw,62px)', fontWeight: 800, lineHeight: 1.12, color: L.fg1, letterSpacing: '-0.025em', marginBottom: 20 }}>
+          <h1 style={{ fontSize: 'clamp(30px,5.5vw,62px)', fontWeight: 800, lineHeight: 1.12, color: L.fg1, letterSpacing: '-0.025em', marginBottom: 18 }}>
             {['شغّل', 'شركتك', 'بالكامل'].map((w, i) => (
               <span key={i} className="hero-word" style={{ animationDelay: `${i * 90}ms` }}>{w} </span>
             ))}
@@ -481,12 +428,12 @@ export default function LandingPage() {
           </h1>
 
           {/* Subtitle */}
-          <p style={{ fontSize: 'clamp(14px,1.9vw,18px)', color: L.fg4, lineHeight: 1.75, maxWidth: 580, margin: '0 auto 36px', animation: 'wordIn 0.7s ease 0.5s both' }}>
+          <p style={{ fontSize: 'clamp(14px,1.9vw,18px)', color: L.fg4, lineHeight: 1.75, maxWidth: 580, margin: '0 auto 28px', animation: 'wordIn 0.7s ease 0.5s both' }}>
             إدارة العملاء، المشاريع، المهام، الفواتير، والمالية — كل شيء في لوحة تحكم واحدة مصممة لوكالات التسويق.
           </p>
 
           {/* CTAs */}
-          <div className="hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12, animation: 'wordIn 0.7s ease 0.7s both' }}>
+          <div className="hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 10, animation: 'wordIn 0.7s ease 0.7s both' }}>
             <button onClick={handleDemo} disabled={demoLoading} className="btn-primary" style={{ opacity: demoLoading ? 0.75 : 1, fontSize: 16, padding: '14px 30px' }}>
               {demoLoading ? 'جاري الفتح...' : 'جرّب الديمو مجاناً'}
             </button>
@@ -499,15 +446,14 @@ export default function LandingPage() {
         </div>
 
         {/* ── Dashboard with perspective tilt ── */}
-        <div style={{ marginTop: 36, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
-          {/* Bottom fade mask — shorter so more of image shows */}
-          <div style={{ position: 'absolute', bottom: 0, insetInline: 0, height: '22%', background: `linear-gradient(to top, var(--bg-app), transparent)`, zIndex: 2, pointerEvents: 'none' }} />
+        <div style={{ marginTop: 44, position: 'relative', padding: '0 clamp(8px,3vw,24px)' }}>
+          {/* Bottom fade mask */}
+          <div style={{ position: 'absolute', bottom: 0, insetInline: 0, height: '20%', background: `linear-gradient(to top, var(--bg-app), transparent)`, zIndex: 2, pointerEvents: 'none' }} />
 
           {/* Glow under mockup */}
           <div style={{ position: 'absolute', bottom: '8%', left: '50%', transform: 'translateX(-50%)', width: '60%', height: 80, background: 'rgba(79,104,49,0.2)', filter: 'blur(52px)', pointerEvents: 'none', zIndex: 0 }} />
 
           <div id="hero-dashboard" style={{ maxWidth: 1060, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-            {/* Outer card with browser chrome */}
             <div style={{
               borderRadius: 18,
               overflow: 'hidden',
